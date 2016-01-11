@@ -83,8 +83,8 @@ class Indexer:
     # Load toc data
     self.sections = {}
     for uri, numstr, title in sections:
-      uri = intern(uri.encode('ascii'))
-      uriKey = intern(self._normalizeScheme(uri))
+      uri = uri.encode('ascii')
+      uriKey = self._normalizeScheme(uri)
       numstr = escapeToNamedASCII(numstr)
       title = escapeToNamedASCII(title) if title else None
       self.sections[uriKey] = Section(uri, title, numstr)
@@ -110,7 +110,7 @@ class Indexer:
         data['file'] = '/'.join((group.name, test.relpath)) \
                        if group.name else test.relpath
         if (data['scripttest']):
-            data['flags'].append(intern('script'))
+            data['flags'].append('script')
         self.alltests.append(data)
         for uri in data['links']:
           uri = self._normalizeScheme(uri)

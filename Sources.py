@@ -147,12 +147,12 @@ class SourceTree(object):
   def getAssetType(self, filePath):
     pathList, fileName = self._splitPath(filePath)
     if (self._isReference(pathList, fileName)):
-      return intern('reference')
+      return 'reference'
     if (self._isTestCase(pathList, fileName)):
-      return intern('testcase')
+      return 'testcase'
     if (self._isTool(pathList, fileName)):
-      return intern('tool')
-    return intern('support')
+      return 'tool'
+    return 'support'
   
 
 class SourceCache:
@@ -632,10 +632,10 @@ class FileSource:
     self.validate()
 
     def encode(str):
-        return str if (hasattr(str, 'line')) else intern(str.encode('utf-8'))
+        return str if (hasattr(str, 'line')) else str.encode('utf-8')
 
-    def escape(str, andIntern = True):
-      return str.encode('utf-8') if asUnicode else intern(escapeToNamedASCII(str)) if andIntern else escapeToNamedASCII(str)
+    def escape(str):
+      return str.encode('utf-8') if asUnicode else escapeToNamedASCII(str)
 
     def listReferences(source, seen):
         refGroups = []
@@ -708,8 +708,8 @@ class FileSource:
     if (self.metadata):
       data = Metadata(
               name       = encode(self.name()),
-              title      = escape(self.metadata['title'], False),
-              asserts    = [escape(assertion, False) for assertion in self.metadata['asserts']],
+              title      = escape(self.metadata['title']),
+              asserts    = [escape(assertion) for assertion in self.metadata['asserts']],
               credits    = [UserData(escape(name), encode(link)) for name, link in self.metadata['credits']],
               reviewers  = [UserData(escape(name), encode(link)) for name, link in self.metadata['reviewers']],
               flags      = [encode(flag) for flag in self.metadata['flags']],
@@ -806,7 +806,7 @@ class ConfigSource(FileSource):
     return '.htaccess'
     
   def type(self):
-    return intern('support')
+    return 'support'
 
   def data(self):
     """Merge contents of all config files represented by this source."""
