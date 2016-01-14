@@ -14,7 +14,7 @@ class HTMLSerializer(object):
 
     gXMLns = 'http://www.w3.org/XML/1998/namespace'
     gHTMLns = 'http://www.w3.org/1999/xhtml'
-  
+
     gDefaultNamespaces = {'http://www.w3.org/XML/1998/namespace': 'xmlns',
                           'http://www.w3.org/2000/xmlns/': 'xmlns',
                           'http://www.w3.org/1999/xlink': 'xlink'}
@@ -40,7 +40,7 @@ class HTMLSerializer(object):
         'style',
         'script'
     ))
-  
+
     gInvisibleChars = frozenset(
         # ASCII control chars
         range(0x0, 0x9) + range(0xB, 0xD) + range(0xE, 0x20) +
@@ -81,12 +81,11 @@ class HTMLSerializer(object):
         'xhtml-basic11':
             '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML Basic 1.1//EN" "http://www.w3.org/TR/xhtml-basic/xhtml-basic11.dtd">'
     }
-  
 
     def __init__(self):
         self._reset()
-  
-    def _reset(self, xhtml = False):
+
+    def _reset(self, xhtml=False):
         self.mOutput = u''
         self.mXHTML = xhtml
 
@@ -120,10 +119,10 @@ class HTMLSerializer(object):
     def _serializeElement(self, element, namespacePrefixes):
         qName = etree.QName(element)
         attrs = element.attrib.items()  # in tree order
-      
+
         if (not namespacePrefixes):
             namespacePrefixes = self.gDefaultNamespaces
-      
+
         if (self.mXHTML):
             namespacePrefixes = copy.copy(namespacePrefixes)
             for attr, value in attrs:
@@ -189,7 +188,7 @@ class HTMLSerializer(object):
         self._output(entity.text)
         if (None != entity.tail):
             self._output(self._escapeXML(entity.tail))
-        
+
     def _serializePI(self, pi):
         if (self.mXHTML):
             self._output('<?', pi.target, ' ', pi.text, '?>')
@@ -197,13 +196,13 @@ class HTMLSerializer(object):
             raise Exception("Processing Instructions can't be converted to HTML")
         if (None != pi.tail):
             self._output(self._escapeXML(pi.tail))
-        
+
     def _serializeComment(self, comment):
         self._output('<!--', comment.text, '-->') # XXX escape comment?
         if (None != comment.tail):
             self._output(self._escapeXML(comment.tail))
-        
-    def _serializeNode(self, node, namespacePrefixes = None):
+
+    def _serializeNode(self, node, namespacePrefixes=None):
         if (isinstance(node, etree._Entity)):
             self._serializeEntity(node)
         elif (isinstance(node, etree._ProcessingInstruction)):
@@ -213,17 +212,16 @@ class HTMLSerializer(object):
         else:
             self._serializeElement(node, namespacePrefixes)
 
-
     def _serializeTree(self, tree):
         root = tree.getroot()
-        preceding = [node for node in root.itersiblings(preceding = True)]
+        preceding = [node for node in root.itersiblings(preceding=True)]
         preceding.reverse()
         for node in preceding:
             self._serializeNode(node)
         self._serializeNode(root)
         for node in root.itersiblings():
             self._serializeNode(node)
-  
+
     def _serializeDoctype(self, tree, doctype, default):
         if (doctype):
             self._output(self.gDocTypes[doctype], '\n')
@@ -260,18 +258,15 @@ class HTMLSerializer(object):
             else:
                 self._output(self.gDocTypes[default], '\n')
 
-
-    def serializeHTML(self, tree, doctype = None):
+    def serializeHTML(self, tree, doctype=None):
         self._reset()
         self._serializeDoctype(tree, doctype, 'html')
         self._serializeTree(tree)
         return self.mOutput
 
-    def serializeXHTML(self, tree, doctype = None):
+    def serializeXHTML(self, tree, doctype=None):
         self._reset(True)
         # XXX '<!xml ...' ??
         self._serializeDoctype(tree, doctype, 'xhtml11')
         self._serializeTree(tree)
         return self.mOutput
-
-

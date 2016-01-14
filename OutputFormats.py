@@ -8,10 +8,12 @@ import os
 from os.path import join, exists, splitext, dirname, basename
 from Sources import XHTMLSource, HTMLSource, SVGSource, SourceTree
 
+
 class ExtensionMap:
   """ Given a file extension mapping (e.g. {'.xht' : '.htm'}), provides
       a translate function for paths.
   """
+
   def __init__(self, extMap):
     self.extMap = extMap
 
@@ -21,6 +23,7 @@ class ExtensionMap:
         return splitext(path)[0] + self.extMap[ext]
     return path
 
+
 class BasicFormat:
   """Base class. A Format manages all the conversions and location
      transformations (e.g. subdirectory for all tests in that format)
@@ -29,8 +32,8 @@ class BasicFormat:
      The base class implementation performs no conversions or
      format-specific location transformations."""
   formatDirName = None
-  indexExt      = '.htm'
-  convert       = True   # XXX hack to supress format conversion in support dirs, need to clean up output code to make this cleaner
+  indexExt = '.htm'
+  convert = True   # XXX hack to supress format conversion in support dirs, need to clean up output code to make this cleaner
 
   def __init__(self, destroot, sourceTree, extMap=None, outputDirName=None):
     """Creates format root of the output tree. `destroot` is the root path
@@ -53,7 +56,7 @@ class BasicFormat:
 
   def destDir(self):
     return join(self.root, self.subdir) if self.subdir else self.root
-    
+
   def dest(self, relpath):
     """Returns final destination of relpath in this format and ensures that the
        parent directory exists."""
@@ -80,15 +83,16 @@ class BasicFormat:
   testTransform = False
   # def testTransform(self, outputString, source) if needed
 
+
 class XHTMLFormat(BasicFormat):
   """Base class for XHTML test suite format. Builds into 'xhtml1' subfolder
      of root.
   """
-  indexExt      = '.xht'
+  indexExt = '.xht'
 
   def __init__(self, destroot, sourceTree, extMap=None, outputDirName='xhtml1'):
     if not extMap:
-      extMap = {'.htm' : '.xht', '.html' : '.xht', '.xhtml' : '.xht' }
+      extMap = {'.htm': '.xht', '.html': '.xht', '.xhtml': '.xht'}
     BasicFormat.__init__(self, destroot, sourceTree, extMap, outputDirName)
 
   def write(self, source):
@@ -100,6 +104,7 @@ class XHTMLFormat(BasicFormat):
     else:
       source.write(self)
 
+
 class HTMLFormat(BasicFormat):
   """Base class for HTML test suite format. Builds into 'html4' subfolder
      of root.
@@ -107,7 +112,7 @@ class HTMLFormat(BasicFormat):
 
   def __init__(self, destroot, sourceTree, extMap=None, outputDirName='html4'):
     if not extMap:
-      extMap = {'.xht' : '.htm', '.xhtml' : '.htm', '.html' : '.htm' }
+      extMap = {'.xht': '.htm', '.xhtml': '.htm', '.html': '.htm'}
     BasicFormat.__init__(self, destroot, sourceTree, extMap, outputDirName)
 
   def write(self, source):
@@ -118,7 +123,7 @@ class HTMLFormat(BasicFormat):
       source.write(self, source.serializeHTML())
     else:
       source.write(self)
-      
+
 
 class HTML5Format(HTMLFormat):
   def __init__(self, destroot, sourceTree, extMap=None, outputDirName='html'):
@@ -137,7 +142,7 @@ class HTML5Format(HTMLFormat):
 class SVGFormat(BasicFormat):
   def __init__(self, destroot, sourceTree, extMap=None, outputDirName='svg'):
     if not extMap:
-      extMap = {'.svg' : '.svg' }
+      extMap = {'.svg': '.svg'}
     BasicFormat.__init__(self, destroot, sourceTree, extMap, outputDirName)
 
   def write(self, source):
@@ -153,7 +158,7 @@ class XHTMLPrintFormat(XHTMLFormat):
 
   def __init__(self, destroot, sourceTree, testSuiteName, extMap=None, outputDirName='xhtml1print'):
     if not extMap:
-      extMap = {'.htm' : '.xht', '.html' : '.xht', '.xhtml' : '.xht' }
+      extMap = {'.htm': '.xht', '.html': '.xht', '.xhtml': '.xht'}
     BasicFormat.__init__(self, destroot, sourceTree, extMap, outputDirName)
     self.testSuiteName = testSuiteName
 
@@ -168,30 +173,30 @@ class XHTMLPrintFormat(XHTMLFormat):
     assert isinstance(source, XHTMLSource)
     output = source.serializeXHTML('xhtml10')
 
-    headermeta = {'suitename' : self.testSuiteName,
-                  'testid'    : source.name(),
-                  'margin'    : '',
-                 }
+    headermeta = {'suitename': self.testSuiteName,
+                  'testid': source.name(),
+                  'margin': '',
+                  }
     if re.search('@page\s*{[^}]*@', output):
       # Don't use headers and footers when page tests margin boxes
       output = re.sub('(<body[^>]*>)',
                       '\1\n' + self.__htmlstart % headermeta,
-                      output);
+                      output)
       output = re.sub('(</body[^>]*>)',
                       '\1\n' + self.__htmlend % headermeta,
-                      output);
+                      output)
     else:
       # add margin rule only when @page statement does not exist
       if not re.search('@page', output):
         headermeta['margin'] = self.__margin
       output = re.sub('</title>',
-                      '</title>\n  <style type="text/css">%s</style>' % \
+                      '</title>\n  <style type="text/css">%s</style>' %
                         (self.__css % headermeta),
-                      output);
-    return output;
+                      output)
+    return output
 
   # template bits
-  __margin = 'margin: 7%;';
+  __margin = 'margin: 7%;'
   __font = 'font: italic 8pt sans-serif; color: gray;'
   __css = """
     @page { %s
@@ -204,4 +209,3 @@ class XHTMLPrintFormat(XHTMLFormat):
 """ % __font
   __htmlstart = '<p style="%s">Start of %%(suitename)s %%(testid)s.</p>' % __font
   __htmlend = '<p style="%s">End of %%(suitename)s %%(testid)s.</p>' % __font
-

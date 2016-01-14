@@ -5,6 +5,8 @@
 
 # Define contains vmethod for Template Toolkit
 from template.stash import list_op
+
+
 @list_op("contains")
 def list_contains(l, x):
   return x in l
@@ -20,16 +22,20 @@ from Utils import listfiles, escapeToNamedASCII
 from OutputFormats import ExtensionMap
 import shutil
 
+
 class Section:
   def __init__(self, uri, title, numstr):
     self.uri = uri
     self.title = title
     self.numstr = numstr
     self.tests = []
+
   def __cmp__(self, other):
     return cmp(self.natsortkey(), other.natsortkey())
+
   def chapterNum(self):
     return self.numstr.partition('.')[0]
+
   def natsortkey(self):
     chunks = self.numstr.partition('.#')[0].split('.')
     for index in range(len(chunks)):
@@ -40,6 +46,7 @@ class Section:
         chunks[index] = (1, chunks[index])
     return (chunks, self.numstr)
 
+
 class Indexer:
 
   def __init__(self, suite, sections, suites, flags, splitChapter=False, templatePathList=None,
@@ -49,7 +56,7 @@ class Indexer:
 
        The toc data file should be list of tab-separated records, one
        per line, of each spec section's uri, number/letter, and title.
-       `splitChapter` selects a single page index if False, chapter 
+       `splitChapter` selects a single page index if False, chapter
        indicies if True.
        `extraData` can be a dictionary whose data gets passed to the templates.
        `overviewCopyExts` lists file extensions that should be found
@@ -60,9 +67,9 @@ class Indexer:
        The '.tmpl' extension, if any, is stripped from the output filename.
        The default value is ['index.htm.tmpl', 'index.xht.tmpl', 'testinfo.data.tmpl']
     """
-    self.suite        = suite
+    self.suite = suite
     self.splitChapter = splitChapter
-    self.extraData    = extraData
+    self.extraData = extraData
     self.overviewCopyExtPat = re.compile('.*(%s)$' % '|'.join(overviewCopyExts))
     self.overviewTmplNames = overviewTmplNames if overviewTmplNames is not None \
       else ['index.htm.tmpl', 'index.xht.tmpl', 'testinfo.data.tmpl',
@@ -75,9 +82,9 @@ class Indexer:
     self.templatePath = [abspath(path) for path in self.templatePath]
     self.tt = Template({
        'INCLUDE_PATH': self.templatePath,
-       'ENCODING'    : 'utf-8',
-       'PRE_CHOMP'   : 1,
-       'POST_CHOMP'  : 0,
+       'ENCODING': 'utf-8',
+       'PRE_CHOMP': 1,
+       'POST_CHOMP': 0,
     })
 
     # Load toc data
@@ -143,23 +150,23 @@ class Indexer:
 
     # Set common values
     data = self.extraData.copy()
-    data['suitetitle']   = self.suite.title
-    data['suite']        = self.suite.name
-    data['specroot']     = self.suite.specroot
-    data['draftroot']    = self.suite.draftroot
+    data['suitetitle'] = self.suite.title
+    data['suite'] = self.suite.name
+    data['specroot'] = self.suite.specroot
+    data['draftroot'] = self.suite.draftroot
     data['contributors'] = self.contributors
-    data['tests']        = self.alltests
-    data['extmap']       = ExtensionMap({'.xht':'', '.html':'', '.htm':'', '.svg':''})
-    data['formats']      = self.suite.formats
-    data['addtests']     = addTests
-    data['suites']       = self.suites
-    data['flagInfo']     = self.flags
-    data['formatInfo']   = { 'html4': { 'report': True, 'path': 'html4', 'ext': 'htm', 'filter': 'nonHTML'},
-                             'html5': { 'report': True, 'path': 'html', 'ext': 'htm', 'filter': 'nonHTML' },
-                             'xhtml1': { 'report': True, 'path': 'xhtml1', 'ext': 'xht', 'filter': 'HTMLonly' },
-                             'xhtml1print': { 'report': False, 'path': 'xhtml1print', 'ext': 'xht', 'filter': 'HTMLonly' },
-                             'svg': { 'report': True, 'path': 'svg', 'ext': 'svg', 'filter': 'HTMLonly' }
-                           }
+    data['tests'] = self.alltests
+    data['extmap'] = ExtensionMap({'.xht': '', '.html': '', '.htm': '', '.svg': ''})
+    data['formats'] = self.suite.formats
+    data['addtests'] = addTests
+    data['suites'] = self.suites
+    data['flagInfo'] = self.flags
+    data['formatInfo'] = {'html4': {'report': True, 'path': 'html4', 'ext': 'htm', 'filter': 'nonHTML'},
+                             'html5': {'report': True, 'path': 'html', 'ext': 'htm', 'filter': 'nonHTML'},
+                             'xhtml1': {'report': True, 'path': 'xhtml1', 'ext': 'xht', 'filter': 'HTMLonly'},
+                             'xhtml1print': {'report': False, 'path': 'xhtml1print', 'ext': 'xht', 'filter': 'HTMLonly'},
+                             'svg': {'report': True, 'path': 'svg', 'ext': 'svg', 'filter': 'HTMLonly'}
+                          }
 
     # Copy simple copy files
     for tmplDir in reversed(self.templatePath):
@@ -175,7 +182,7 @@ class Indexer:
 
     # Report errors
     if (self.errors):
-        if type(errorOut) is type(('tmpl','out')):
+        if type(errorOut) is type(('tmpl', 'out')):
             data['errors'] = errors
             self.__writeTemplate(errorOut[0], data, join(destDir, errorOut[1]))
         else:
@@ -191,17 +198,17 @@ class Indexer:
     # Set common values
     data = self.extraData.copy()
     data['suitetitle'] = self.suite.title
-    data['suite']      = self.suite.name
-    data['specroot']   = self.suite.specroot
-    data['draftroot']  = self.suite.draftroot
-    
-    data['indexext']   = format.indexExt
-    data['isXML']      = format.indexExt.startswith('.x')
-    data['formatdir']  = format.formatDirName
-    data['extmap']     = format.extMap
-    data['tests']      = self.alltests
-    data['suites']     = self.suites
-    data['flagInfo']   = self.flags
+    data['suite'] = self.suite.name
+    data['specroot'] = self.suite.specroot
+    data['draftroot'] = self.suite.draftroot
+
+    data['indexext'] = format.indexExt
+    data['isXML'] = format.indexExt.startswith('.x')
+    data['formatdir'] = format.formatDirName
+    data['extmap'] = format.extMap
+    data['tests'] = self.alltests
+    data['suites'] = self.suites
+    data['flagInfo'] = self.flags
 
     # Generate indices:
 
@@ -239,9 +246,9 @@ class Indexer:
       # Generate chapter tocs
       for chap in chapters:
         data['chaptertitle'] = chap.title
-        data['testcount']    = chap.testcount
-        data['sections']     = chap.sections
-        self.__writeTemplate('test-toc.tmpl', data, format.dest('chapter-%s%s' \
+        data['testcount'] = chap.testcount
+        data['sections'] = chap.sections
+        self.__writeTemplate('test-toc.tmpl', data, format.dest('chapter-%s%s'
                              % (chap.numstr, format.indexExt)))
 
     else: # not splitChapter

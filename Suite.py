@@ -12,17 +12,18 @@ from os.path import join
 import os
 from mercurial import ui as UserInterface, hg
 
+
 class TestSuite:
   """Representation of a standard CSS test suite."""
 
-  def __init__(self, name, title, specUri, draftUri, sourceCache = None, ui = None):
+  def __init__(self, name, title, specUri, draftUri, sourceCache=None, ui=None):
     self.name = name
     self.title = title
     self.specroot = specUri
     self.draftroot = draftUri
 
     self.ui = ui if ui else UserInterface.ui()
-    self.defaultReftestRelpath='reftest.list'
+    self.defaultReftestRelpath = 'reftest.list'
     self.groups = {}
     self.sourcecache = sourceCache if sourceCache else SourceCache(SourceTree(hg.repository(self.ui, '.')))
     self.formats = ('html4', 'xhtml1', 'xhtml1print') # XXX FIXME, hardcoded list is lame
@@ -32,15 +33,14 @@ class TestSuite:
     """Add tests from directory `dir` by file extension (via `ext`, e.g. ext='.xht').
     """
     group = TestGroup(self.sourcecache, dir, selfTestExt=ext,
-                      name=groupName, title=groupTitle, ui = self.ui)
+                      name=groupName, title=groupTitle, ui=self.ui)
     self.addGroup(group)
-
 
   def addTestsByList(self, dir, filenames, groupName='', groupTitle=''):
     """Add tests from directory `dir`, via file name list `filenames`.
     """
     group = TestGroup(self.sourcecache, dir, selfTestList=filenames,
-                      name=groupName, title=groupTitle, ui = self.ui)
+                      name=groupName, title=groupTitle, ui=self.ui)
     self.addGroup(group)
 
   def addReftests(self, dir, manifestPath, groupName='', groupTitle=''):
@@ -50,7 +50,7 @@ class TestSuite:
     group = TestGroup(self.sourcecache,
                       dir, manifestPath=manifestPath,
                       manifestDest=self.defaultReftestRelpath,
-                      name=groupName, title=groupTitle, ui = self.ui)
+                      name=groupName, title=groupTitle, ui=self.ui)
     self.addGroup(group)
 
   def addGroup(self, group):
@@ -70,7 +70,7 @@ class TestSuite:
 
   def setFormats(self, formats):
     self.formats = formats
-    
+
   def buildInto(self, dest, indexer):
     """Builds test suite through all OutputFormats into directory at path `dest`
        or through OutputFormat destination `dest`, using Indexer `indexer`.
@@ -102,20 +102,18 @@ class TestSuite:
     for format in formats:
       indexer.writeIndex(format)
 
-
     rawtests = []
     for src, relpath in self.rawgroups.items():
-      copytree(src, join(dest,relpath))
-      for (root, dirs, files) in os.walk(join(dest,relpath)):
+      copytree(src, join(dest, relpath))
+      for (root, dirs, files) in os.walk(join(dest, relpath)):
         for xdir in excludeDirs:
           if xdir in dirs:
             dirs.remove(xdir)
-            rmtree(join(root,xdir))
+            rmtree(join(root, xdir))
         rawtests.extend(
-          [join(Utils.relpath(root,dest),file)
+          [join(Utils.relpath(root, dest), file)
            for file in files]
         )
 
     rawtests.sort()
     indexer.writeOverview(dest, addTests=rawtests)
-    

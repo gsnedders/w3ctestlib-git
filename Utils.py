@@ -14,13 +14,16 @@ os.environ['XML_CATALOG_FILES'] = os.path.join(w3ctestlib.__path__[0], 'catalog/
 import os.path
 from os.path import sep, pardir
 
+
 def assetName(path):
   return os.path.splitext(os.path.basename(path))[0].lower().encode('ascii')
-  
+
+
 def basepath(path):
   """ Returns the path part of os.path.split.
   """
   return os.path.split(path)[0]
+
 
 def isPathInsideBase(path, base=''):
   path = os.path.normpath(path)
@@ -35,6 +38,7 @@ def isPathInsideBase(path, base=''):
         return False
     return not pathlist[0].startswith(os.path.pardir)
   return not path.startswith(os.path.pardir)
+
 
 def relpath(path, start):
   """Return relative path from start to end. WARNING: this is not the
@@ -65,10 +69,11 @@ def relpath(path, start):
     else:
         i += 1
 
-    rel_list = [pardir] * (len(start_list)-i) + path_list[i:]
+    rel_list = [pardir] * (len(start_list) - i) + path_list[i:]
     if not rel_list:
         return os.path.curdir
     return os.path.join(*rel_list)
+
 
 def relativeURL(start, end):
   """ Returns relative URL from `start` to `end`.
@@ -78,40 +83,43 @@ def relativeURL(start, end):
 #  else:
   return relpath(end, basepath(start))
 
-def listfiles(path, ext = None):
+
+def listfiles(path, ext=None):
   """ Returns a list of all files in a directory.
       Optionally lists only files with a given extension.
   """
   try:
-    _,_,files = os.walk(path).next()
+    _, _, files = os.walk(path).next()
     if (ext):
       files = [fileName for fileName in files if fileName.endswith(ext)]
   except StopIteration, e:
     files = []
   return files
 
+
 def listdirs(path):
   """ Returns a list of all subdirectories in a directory.
   """
   try:
-    _,dirs,_ = os.walk(path).next()
+    _, dirs, _ = os.walk(path).next()
   except StopIteration, e:
     dirs = []
   return dirs
 
 ###### MIME types and file extensions ######
 
-extensionMap = { None     : 'application/octet-stream', # default
-                 '.xht'   : 'application/xhtml+xml',
-                 '.xhtml' : 'application/xhtml+xml',
-                 '.xml'   : 'application/xml',
-                 '.htm'   : 'text/html',
-                 '.html'  : 'text/html',
-                 '.txt'   : 'text/plain',
-                 '.jpg'   : 'image/jpeg',
-                 '.png'   : 'image/png',
-                 '.svg'   : 'image/svg+xml',
-               }
+extensionMap = {None: 'application/octet-stream', # default
+                 '.xht': 'application/xhtml+xml',
+                 '.xhtml': 'application/xhtml+xml',
+                 '.xml': 'application/xml',
+                 '.htm': 'text/html',
+                 '.html': 'text/html',
+                 '.txt': 'text/plain',
+                 '.jpg': 'image/jpeg',
+                 '.png': 'image/png',
+                 '.svg': 'image/svg+xml',
+                }
+
 
 def getMimeFromExt(filepath):
   """Convenience function: equal to extenionMap.get(ext, extensionMap[None]).
@@ -126,7 +134,8 @@ def getMimeFromExt(filepath):
 import types
 from htmlentitydefs import entitydefs
 
-entityify = dict([c,e] for e,c in entitydefs.iteritems())
+entityify = dict([c, e] for e, c in entitydefs.iteritems())
+
 
 def escapeMarkup(data):
   """Escape markup characters (&, >, <). Copied from xml.sax.saxutils.
@@ -137,10 +146,12 @@ def escapeMarkup(data):
   data = data.replace("<", "&lt;")
   return data
 
+
 def escapeToNamedASCII(text):
   """Escapes to named entities where possible and numeric-escapes non-ASCII
   """
   return escapeToNamed(text).encode('ascii', 'xmlcharrefreplace')
+
 
 def escapeToNamed(text):
   """Escape characters with named entities.

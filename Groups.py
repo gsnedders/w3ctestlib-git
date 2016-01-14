@@ -13,6 +13,7 @@ from Utils import listfiles
 
 excludeDirs = ['CVS', '.svn', '.hg']
 
+
 class TestGroup:
   """Base class for test groups. Should never be used directly.
   """
@@ -26,7 +27,7 @@ class TestGroup:
       groupA.merge(groupB)
     return groupA or groupB
 
-  def __init__(self, sourceCache, importDir, name=None, title=None, ui = None, **kwargs):
+  def __init__(self, sourceCache, importDir, name=None, title=None, ui=None, **kwargs):
     """Initialize with:
          SourceCache `sourceCache`
          Group name `name`, which must be a possible directory name or None
@@ -46,9 +47,9 @@ class TestGroup:
     # Save name
     self.name = name
     self.title = title
-    
+
     self.ui = ui
-    
+
     sourceTree = sourceCache.sourceTree
 
     # Load htaccess
@@ -73,7 +74,7 @@ class TestGroup:
 
     # Load tests
     self.tests = SourceSet(sourceCache)
-    self.refs  = SourceSet(sourceCache)
+    self.refs = SourceSet(sourceCache)
 
     # Read manifest
     manifestPath = kwargs.get('manifestPath', None)
@@ -106,6 +107,7 @@ class TestGroup:
       if (test.isReftest()):
         usedRefs = {}
         usedRefs[test.sourcepath] = '=='
+
         def loadReferences(source): # XXX need to verify refType for mutual exclusion (ie: a == b != a)
           for refSrcPath, refRelPath, refType in source.getReferencePaths():
             if (exists(refSrcPath)):
@@ -119,7 +121,6 @@ class TestGroup:
             else:
               ui.warn("Missing Reference file: ", refSrcPath, "\n  referenced from: ", source.sourcepath, "\n")
         loadReferences(test)
-
 
   def sourceCache(self):
     return self.support.sourceCache
@@ -135,11 +136,11 @@ class TestGroup:
   def _initFrom(self, group=None):
     """Initialize with data from TestGroup `group`."""
     # copy
-    self.name     = group.name if group else None
-    self.title    = group.title if group else None
+    self.name = group.name if group else None
+    self.title = group.title if group else None
     self.htaccess = group.htaccess if group else None
-    self.support  = group.support if group else None
-    self.tests    = group.tests if group else None
+    self.support = group.support if group else None
+    self.tests = group.tests if group else None
 
   def merge(self, other):
     """Merge Group `other`'s contents into this Group and clear its contents.
@@ -157,15 +158,14 @@ class TestGroup:
 
     self.tests = SourceSet.combine(self.tests, other.tests, self.ui)
     other.tests = None
-    
-    self.refs  = SourceSet.combine(self.refs, other.refs, self.ui)
+
+    self.refs = SourceSet.combine(self.refs, other.refs, self.ui)
     other.refs = None
     if self.manifest and other.manifest:
       self.manifest.append(other.manifest)
     else:
       self.manifest = self.manifest or other.manifest
     other.manifest = None
-    
 
   def build(self, format):
     """Build Group's contents through OutputFormat `format`.
@@ -198,4 +198,3 @@ class TestGroup:
       shutil.copytree(supportDir, join(referenceDir, 'support'))
 
     format.setSubDir()
-
