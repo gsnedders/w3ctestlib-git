@@ -166,7 +166,7 @@ class HTMLSerializer(object):
         else:
             self._output('>')
 
-            if (None != element.text):
+            if (element.text is not None):
                 if ((qName.namespace == self.gHTMLns) and (qName.localname in self.gCDataElements)):
                     if (self.mXHTML):
                         self._output(self._escapeXML(element.text)) # or self._output('<![CDATA[', element.text, ']]>')
@@ -180,12 +180,12 @@ class HTMLSerializer(object):
 
             self._output('</', qName.localname, '>')
 
-        if (None != element.tail):
+        if (element.tail is not None):
             self._output(self._escapeXML(element.tail))
 
     def _serializeEntity(self, entity):
         self._output(entity.text)
-        if (None != entity.tail):
+        if (entity.tail is not None):
             self._output(self._escapeXML(entity.tail))
 
     def _serializePI(self, pi):
@@ -193,12 +193,12 @@ class HTMLSerializer(object):
             self._output('<?', pi.target, ' ', pi.text, '?>')
         else:
             raise Exception("Processing Instructions can't be converted to HTML")
-        if (None != pi.tail):
+        if (pi.tail is not None):
             self._output(self._escapeXML(pi.tail))
 
     def _serializeComment(self, comment):
         self._output('<!--', comment.text, '-->') # XXX escape comment?
-        if (None != comment.tail):
+        if (comment.tail is not None):
             self._output(self._escapeXML(comment.tail))
 
     def _serializeNode(self, node, namespacePrefixes=None):

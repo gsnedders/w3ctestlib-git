@@ -171,7 +171,7 @@ class SourceCache:
 
        Cache is bypassed if loading form a change context
     """
-    if ((None == data) and sourcepath in self.__cache):
+    if data is None and sourcepath in self.__cache:
       source = self.__cache[sourcepath]
       assert relpath == source.relpath
       return source
@@ -189,7 +189,7 @@ class SourceCache:
       source = XMLSource(self.sourceTree, sourcepath, relpath, data)
     else:
       source = FileSource(self.sourceTree, sourcepath, relpath, mime, data)
-    if (None == data):
+    if data is None:
       self.__cache[sourcepath] = source
     return source
 
@@ -1036,7 +1036,7 @@ class XMLSource(FileSource):
 
   def getMetadataElements(self, tree):
     container = self.getMeatdataContainer()
-    if (None != container):
+    if container is not None:
       return [node for node in container]
     return None
 
@@ -1128,14 +1128,14 @@ class XMLSource(FileSource):
                         errors.append(LineString("Flags must only be specified once.", node.sourceline))
                     else:
                         readFlags = True
-                        if (None == node.get('content')):
+                        if (node.get('content') is None):
                             errors.append(LineString("Flags meta missing content attribute.", node.sourceline))
                         else:
                             for flag in sorted(node.get('content').split()):
                                 flags.append(flag)
                 # test assertions
                 elif ('assert' == metatype):
-                    if (None == node.get('content')):
+                    if (node.get('content') is None):
                         errors.append(LineString("Assert meta missing content attribute.", node.sourceline))
                     else:
                         asserts.append(node.get('content').strip().replace('\t', ' '))
