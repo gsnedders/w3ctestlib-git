@@ -120,7 +120,7 @@ class Indexer:
         for uri in data['links']:
           uri = self._normalizeScheme(uri)
           uri = uri.replace(self._normalizeScheme(self.suite.draftroot), self._normalizeScheme(self.suite.specroot))
-          if self.sections.has_key(uri):
+          if uri in self.sections:
             self.sections[uri].tests.append(data)
         for credit in data['credits']:
           self.contributors[credit[0]] = credit[1]

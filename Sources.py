@@ -171,7 +171,7 @@ class SourceCache:
 
        Cache is bypassed if loading form a change context
     """
-    if ((None == data) and self.__cache.has_key(sourcepath)):
+    if ((None == data) and sourcepath in self.__cache):
       source = self.__cache[sourcepath]
       assert relpath == source.relpath
       return source
