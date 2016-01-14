@@ -142,9 +142,8 @@ class XMLSource(FileSource):
       output = self.unicode()
 
     # write
-    f = open(format.dest(self.relpath), 'w')
-    f.write(output.encode(self.encoding, 'xmlcharrefreplace'))
-    f.close()
+    with open(format.dest(self.relpath), 'w') as f:
+      f.write(output.encode(self.encoding, 'xmlcharrefreplace'))
 
   def compact(self):
     self.tree = None

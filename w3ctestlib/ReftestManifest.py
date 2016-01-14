@@ -47,32 +47,33 @@ class ReftestManifest(ConfigSource):
     for src in self.sourcepath:
       relbase = basepath(self.relpath)
       srcbase = basepath(src)
-      for line in open(src):
-        strip = self.baseRE.search(line)
-        if strip:
-          striplist.append(strip.group(1))
-        line = self.stripRE.sub('', line)
-        m = self.parseRE.search(line)
-        if m:
-          record = ((join(srcbase, m.group(2)), join(srcbase, m.group(3))),
-                    (join(relbase, m.group(2)), join(relbase, m.group(3))),
-                    m.group(1))
-          # for strip in striplist:
-          # strip relrecord
-          if not exists(record[0][0]):
-            raise ReftestFilepathError("Manifest Error in %s: "
-                                       "Reftest test file %s does not exist."
-                                       % (src, record[0][0]))
-          elif not exists(record[0][1]):
-            raise ReftestFilepathError("Manifest Error in %s: "
-                                       "Reftest reference file %s does not exist."
-                                       % (src, record[0][1]))
-          elif not isPathInsideBase(record[1][0]):
-            raise ReftestFilepathError("Manifest Error in %s: "
-                                       "Reftest test replath %s not within relpath root."
-                                       % (src, record[1][0]))
-          elif not isPathInsideBase(record[1][1]):
-            raise ReftestFilepathError("Manifest Error in %s: "
-                                       "Reftest test replath %s not within relpath root."
-                                       % (src, record[1][1]))
-          yield record
+      with open(src) as f:
+        for line in f:
+          strip = self.baseRE.search(line)
+          if strip:
+            striplist.append(strip.group(1))
+          line = self.stripRE.sub('', line)
+          m = self.parseRE.search(line)
+          if m:
+            record = ((join(srcbase, m.group(2)), join(srcbase, m.group(3))),
+                      (join(relbase, m.group(2)), join(relbase, m.group(3))),
+                      m.group(1))
+            # for strip in striplist:
+            # strip relrecord
+            if not exists(record[0][0]):
+              raise ReftestFilepathError("Manifest Error in %s: "
+                                         "Reftest test file %s does not exist."
+                                         % (src, record[0][0]))
+            elif not exists(record[0][1]):
+              raise ReftestFilepathError("Manifest Error in %s: "
+                                         "Reftest reference file %s does not exist."
+                                         % (src, record[0][1]))
+            elif not isPathInsideBase(record[1][0]):
+              raise ReftestFilepathError("Manifest Error in %s: "
+                                         "Reftest test replath %s not within relpath root."
+                                         % (src, record[1][0]))
+            elif not isPathInsideBase(record[1][1]):
+              raise ReftestFilepathError("Manifest Error in %s: "
+                                         "Reftest test replath %s not within relpath root."
+                                         % (src, record[1][1]))
+            yield record

@@ -44,7 +44,8 @@ class ConfigSource(FileSource):
     """Merge contents of all config files represented by this source."""
     data = ''
     for src in self.sourcepath:
-      data += open(src).read()
+      with open(src) as f:
+        data += f.read()
       data += '\n'
     return data
 

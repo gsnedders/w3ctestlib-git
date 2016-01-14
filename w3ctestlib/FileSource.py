@@ -69,7 +69,8 @@ class FileSource:
   def data(self):
     """Return file contents as a byte string."""
     if (self._data is None):
-      self._data = open(self.sourcepath, 'r').read()
+      with open(self.sourcepath, 'r') as f:
+        self._data = f.read()
     if (self._data.startswith(codecs.BOM_UTF8)):
       self.encoding = 'utf-8-sig' # XXX look for other unicode BOMs
     return self._data
@@ -124,8 +125,8 @@ class FileSource:
   def write(self, format):
     """Writes FileSource.data() out to `self.relpath` through Format `format`."""
     data = self.data()
-    f = open(format.dest(self.relpath), 'w')
-    f.write(data)
+    with open(format.dest(self.relpath), 'w') as f:
+      f.write(data)
     if (self.metaSource):
       self.metaSource.write(format) # XXX need to get output path from format, but not let it choose actual format
 
