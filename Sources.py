@@ -1408,7 +1408,7 @@ class HTMLSource(XMLSource):
           nodeList.append((element, xlinkns + attr, attr))
 
     for child in element:
-        if (type(child.tag) == type('')): # element node
+        if isinstance(child.tag, basestring): # element node
             qName = etree.QName(child.tag)
             if ('foreignobject' != qName.localname.lower()):
                 injected |= self._injectXLinks(child, nodeList)

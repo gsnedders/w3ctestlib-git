@@ -183,7 +183,7 @@ class Indexer:
 
     # Report errors
     if (self.errors):
-        if type(errorOut) is type(('tmpl', 'out')):
+        if errorOut is ('tmpl', 'out'):
             data['errors'] = self.errors
             self.__writeTemplate(errorOut[0], data, join(destDir, errorOut[1]))
         else:

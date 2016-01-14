@@ -131,7 +131,6 @@ def getMimeFromExt(filepath):
 
 ###### Escaping ######
 
-import types
 from htmlentitydefs import entitydefs
 
 entityify = dict([c, e] for e, c in entitydefs.iteritems())
@@ -161,7 +160,7 @@ def escapeToNamed(text):
   for c in text:
     if ord(c) > 127:
       escapable.add(c)
-  if type(text) == types.UnicodeType:
+  if isinstance(text, unicode):
     for c in escapable:
       cLatin = c.encode('Latin-1', 'ignore')
       if (cLatin in entityify):
