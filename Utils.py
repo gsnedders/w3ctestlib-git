@@ -58,10 +58,10 @@ def relpath(path, start):
         unc_start, rest = os.path.splitunc(start)
         if bool(unc_path) ^ bool(unc_start):
             raise ValueError("Cannot mix UNC and non-UNC paths (%s and %s)"
-                                                                % (path, start))
+                             % (path, start))
         else:
             raise ValueError("path is on drive %s, start on drive %s"
-                                                % (path_list[0], start_list[0]))
+                             % (path_list[0], start_list[0]))
     # Work out how much of the filepath is shared by start and path.
     for i in range(min(len(start_list), len(path_list))):
         if start_list[i].lower() != path_list[i].lower():
@@ -109,15 +109,15 @@ def listdirs(path):
 ###### MIME types and file extensions ######
 
 extensionMap = {None: 'application/octet-stream', # default
-                 '.xht': 'application/xhtml+xml',
-                 '.xhtml': 'application/xhtml+xml',
-                 '.xml': 'application/xml',
-                 '.htm': 'text/html',
-                 '.html': 'text/html',
-                 '.txt': 'text/plain',
-                 '.jpg': 'image/jpeg',
-                 '.png': 'image/png',
-                 '.svg': 'image/svg+xml',
+                '.xht': 'application/xhtml+xml',
+                '.xhtml': 'application/xhtml+xml',
+                '.xml': 'application/xml',
+                '.htm': 'text/html',
+                '.html': 'text/html',
+                '.txt': 'text/plain',
+                '.jpg': 'image/jpeg',
+                '.png': 'image/png',
+                '.svg': 'image/svg+xml',
                 }
 
 

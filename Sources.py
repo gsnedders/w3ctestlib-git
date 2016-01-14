@@ -231,7 +231,7 @@ class SourceSet:
           cachedSource.append(source)
         else:
           ui.warn("File merge mismatch %s vs %s for %s\n" %
-                (cachedSource.sourcepath, source.sourcepath, source.name()))
+                  (cachedSource.sourcepath, source.sourcepath, source.name()))
 
   def add(self, sourcepath, relpath, ui):
     """Generate and add FileSource from sourceCache. Return the resulting
@@ -501,7 +501,7 @@ class FileSource:
     if not isinstance(other, FileSource):
       return False
     return self.sourcepath == other.sourcepath or \
-           filecmp.cmp(self.sourcepath, other.sourcepath)
+      filecmp.cmp(self.sourcepath, other.sourcepath)
 
   def __ne__(self, other):
     return not self == other
@@ -710,18 +710,18 @@ class FileSource:
 
     if (self.metadata):
       data = Metadata(
-              name=encode(self.name()),
-              title=escape(self.metadata['title']),
-              asserts=[escape(assertion) for assertion in self.metadata['asserts']],
-              credits=[UserData(escape(name), encode(link)) for name, link in self.metadata['credits']],
-              reviewers=[UserData(escape(name), encode(link)) for name, link in self.metadata['reviewers']],
-              flags=[encode(flag) for flag in self.metadata['flags']],
-              links=[encode(link) for link in self.metadata['links']],
-              references=references,
-              revision=self.revision(),
-              selftest=self.isSelftest(),
-              scripttest=self.isScripttest()
-             )
+        name=encode(self.name()),
+        title=escape(self.metadata['title']),
+        asserts=[escape(assertion) for assertion in self.metadata['asserts']],
+        credits=[UserData(escape(name), encode(link)) for name, link in self.metadata['credits']],
+        reviewers=[UserData(escape(name), encode(link)) for name, link in self.metadata['reviewers']],
+        flags=[encode(flag) for flag in self.metadata['flags']],
+        links=[encode(link) for link in self.metadata['links']],
+        references=references,
+        revision=self.revision(),
+        selftest=self.isSelftest(),
+        scripttest=self.isScripttest()
+      )
       return data
     return None
 
@@ -877,12 +877,12 @@ class ReftestManifest(ConfigSource):
           record = ((join(srcbase, m.group(2)), join(srcbase, m.group(3))),
                     (join(relbase, m.group(2)), join(relbase, m.group(3))),
                     m.group(1))
-#          for strip in striplist:
-            # strip relrecord
+          # for strip in striplist:
+          # strip relrecord
           if not exists(record[0][0]):
             raise ReftestFilepathError("Manifest Error in %s: "
                                        "Reftest test file %s does not exist."
-                                        % (src, record[0][0]))
+                                       % (src, record[0][0]))
           elif not exists(record[0][1]):
             raise ReftestFilepathError("Manifest Error in %s: "
                                        "Reftest reference file %s does not exist."

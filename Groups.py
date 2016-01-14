@@ -53,8 +53,10 @@ class TestGroup:
 
     # Load htaccess
     htapath = join(importDir, '.htaccess')
-    self.htaccess = ConfigSource(sourceTree, htapath, '.htaccess') \
-                    if exists(htapath) else None
+    if exists(htapath):
+      self.htaccess = ConfigSource(sourceTree, htapath, '.htaccess')
+    else:
+      self.htaccess = None
 
     # Load support files
     self.support = SourceSet(sourceCache)
@@ -145,7 +147,7 @@ class TestGroup:
     """Merge Group `other`'s contents into this Group and clear its contents.
     """
     assert isinstance(other, TestGroup), \
-           "Expected Group instance, got %s" % type(other)
+      "Expected Group instance, got %s" % type(other)
     if self.htaccess and other.htaccess:
       self.htaccess.append(other.htaccess)
     else:

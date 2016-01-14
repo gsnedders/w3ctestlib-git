@@ -69,9 +69,12 @@ class Indexer:
     self.splitChapter = splitChapter
     self.extraData = extraData
     self.overviewCopyExtPat = re.compile('.*(%s)$' % '|'.join(overviewCopyExts))
-    self.overviewTmplNames = overviewTmplNames if overviewTmplNames is not None \
-      else ['index.htm.tmpl', 'index.xht.tmpl', 'testinfo.data.tmpl',
-            'implementation-report-TEMPLATE.data.tmpl']
+    if overviewTmplNames is not None:
+      self.overviewTmplNames = overviewTmplNames
+    else:
+      self.overviewTmplNames = ['index.htm.tmpl', 'index.xht.tmpl',
+                                'testinfo.data.tmpl',
+                                'implementation-report-TEMPLATE.data.tmpl']
 
     # Initialize template engine
     self.templatePath = [join(w3ctestlib.__path__[0], 'templates')]
@@ -79,10 +82,10 @@ class Indexer:
       self.templatePath.extend(templatePathList)
     self.templatePath = [abspath(path) for path in self.templatePath]
     self.tt = Template({
-       'INCLUDE_PATH': self.templatePath,
-       'ENCODING': 'utf-8',
-       'PRE_CHOMP': 1,
-       'POST_CHOMP': 0,
+      'INCLUDE_PATH': self.templatePath,
+      'ENCODING': 'utf-8',
+      'PRE_CHOMP': 1,
+      'POST_CHOMP': 0,
     })
 
     # Load toc data
@@ -160,10 +163,10 @@ class Indexer:
     data['suites'] = self.suites
     data['flagInfo'] = self.flags
     data['formatInfo'] = {'html4': {'report': True, 'path': 'html4', 'ext': 'htm', 'filter': 'nonHTML'},
-                             'html5': {'report': True, 'path': 'html', 'ext': 'htm', 'filter': 'nonHTML'},
-                             'xhtml1': {'report': True, 'path': 'xhtml1', 'ext': 'xht', 'filter': 'HTMLonly'},
-                             'xhtml1print': {'report': False, 'path': 'xhtml1print', 'ext': 'xht', 'filter': 'HTMLonly'},
-                             'svg': {'report': True, 'path': 'svg', 'ext': 'svg', 'filter': 'HTMLonly'}
+                          'html5': {'report': True, 'path': 'html', 'ext': 'htm', 'filter': 'nonHTML'},
+                          'xhtml1': {'report': True, 'path': 'xhtml1', 'ext': 'xht', 'filter': 'HTMLonly'},
+                          'xhtml1print': {'report': False, 'path': 'xhtml1print', 'ext': 'xht', 'filter': 'HTMLonly'},
+                          'svg': {'report': True, 'path': 'svg', 'ext': 'svg', 'filter': 'HTMLonly'}
                           }
 
     # Copy simple copy files
@@ -187,7 +190,7 @@ class Indexer:
             sys.stdout.flush()
             for errorLocation in self.errors:
                 print >> errorOut, "Error in %s: %s" % \
-                               (errorLocation, ' '.join([str(error) for error in self.errors[errorLocation]]))
+                  (errorLocation, ' '.join([str(error) for error in self.errors[errorLocation]]))
 
   def writeIndex(self, format):
     """Write indices into test suite build output through format `format`.
@@ -247,7 +250,7 @@ class Indexer:
         data['testcount'] = chap.testcount
         data['sections'] = chap.sections
         self.__writeTemplate('test-toc.tmpl', data, format.dest('chapter-%s%s'
-                             % (chap.numstr, format.indexExt)))
+                                                                % (chap.numstr, format.indexExt)))
 
     else: # not splitChapter
       data['chapters'] = sectionlist

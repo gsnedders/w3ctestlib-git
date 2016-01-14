@@ -66,8 +66,7 @@ class BasicFormat:
     if (self.sourceTree.isReferenceAnywhere(relpath)):
       relpath = join('reference', basename(relpath))
     # XXX when forcing support files into support path, need to account for support/support
-    dest = join(self.root, self.subdir, relpath) if self.subdir \
-           else join(self.root, relpath)
+    dest = join(self.root, self.subdir, relpath) if self.subdir else join(self.root, relpath)
     # Ensure parent
     parent = dirname(dest)
     if not exists(parent):
@@ -191,7 +190,7 @@ class XHTMLPrintFormat(XHTMLFormat):
         headermeta['margin'] = self.__margin
       output = re.sub('</title>',
                       '</title>\n  <style type="text/css">%s</style>' %
-                        (self.__css % headermeta),
+                      (self.__css % headermeta),
                       output)
     return output
 
