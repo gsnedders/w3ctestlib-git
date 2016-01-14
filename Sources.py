@@ -999,7 +999,8 @@ class XMLSource(FileSource):
     """Clears all injected elements from the tree, or clears injected
        elements tagged with `tagCode` if `tagCode` is given.
     """
-    if not self.injectedTags or not self.tree: return
+    if not self.injectedTags or not self.tree:
+      return
     for node in self.injectedTags:
       node.getparent().remove(node)
       del self.injectedTags[node]
@@ -1041,7 +1042,12 @@ class XMLSource(FileSource):
 
   def extractMetadata(self, tree):
     """Extract metadata from tree."""
-    links = []; credits = []; reviewers = []; flags = []; asserts = []; title = ''
+    links = []
+    credits = []
+    reviewers = []
+    flags = []
+    asserts = []
+    title = ''
 
     def tokenMatch(token, string):
         return bool(re.search('(^|\s+)%s($|\s+)' % token, string)) if (string) else False
@@ -1221,7 +1227,12 @@ class SVGSource(XMLSource):
 
   def extractMetadata(self, tree):
     """Extract metadata from tree."""
-    links = []; credits = []; reviewers = []; flags = []; asserts = []; title = ''
+    links = []
+    credits = []
+    reviewers = []
+    flags = []
+    asserts = []
+    title = ''
 
     def tokenMatch(token, string):
         return bool(re.search('(^|\s+)%s($|\s+)' % token, string)) if (string) else False
