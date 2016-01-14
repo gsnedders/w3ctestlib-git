@@ -6,7 +6,7 @@
 import re
 import os
 from os.path import join, exists, splitext, dirname, basename
-from Sources import XHTMLSource, HTMLSource, SVGSource, SourceTree
+from Sources import XHTMLSource, HTMLSource, SVGSource
 
 
 class ExtensionMap:

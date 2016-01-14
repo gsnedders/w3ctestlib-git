@@ -4,11 +4,10 @@
 # Licensed under BSD 3-Clause: <http://www.w3.org/Consortium/Legal/2008/03-bsd-license>
 
 import shutil
-import filecmp
 import os.path
 import Utils
 from os.path import exists, join
-from Sources import SourceCache, SourceSet, ConfigSource, ReftestManifest
+from Sources import SourceSet, ConfigSource, ReftestManifest
 from Utils import listfiles
 
 excludeDirs = ['CVS', '.svn', '.hg']

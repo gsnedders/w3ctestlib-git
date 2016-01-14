@@ -6,15 +6,12 @@
 from os.path import basename, exists, join
 import os
 import filecmp
-import shutil
 import re
 import codecs
 import collections
-from xml import dom
 import html5lib
-from html5lib import treebuilders, inputstream
+from html5lib import treebuilders
 from lxml import etree
-from lxml.etree import ParseError
 from Utils import getMimeFromExt, escapeToNamedASCII, basepath, isPathInsideBase, relativeURL, assetName
 import HTMLSerializer
 import warnings
@@ -532,7 +529,7 @@ class FileSource:
   def unicode(self):
     try:
       return self.data().decode(self.encoding)
-    except UnicodeDecodeError, e:
+    except UnicodeDecodeError:
       return None
 
   def parse(self):

@@ -4,7 +4,6 @@
 # additions by peter.linss@hp.com copyright 2013 Hewlett-Packard
 # Licensed under BSD 3-Clause: <http://www.w3.org/Consortium/Legal/2008/03-bsd-license>
 
-import lxml
 from lxml import etree
 import htmlentitydefs
 import copy

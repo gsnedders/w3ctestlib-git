@@ -13,9 +13,7 @@ def list_contains(l, x):
 
 import sys
 import re
-import os
-import codecs
-from os.path import join, exists, abspath
+from os.path import join, abspath
 from template import Template
 import w3ctestlib
 from Utils import listfiles, escapeToNamedASCII
@@ -123,7 +121,7 @@ class Indexer:
           uri = self._normalizeScheme(uri)
           uri = uri.replace(self._normalizeScheme(self.suite.draftroot), self._normalizeScheme(self.suite.specroot))
           if self.sections.has_key(uri):
-            testlist = self.sections[uri].tests.append(data)
+            self.sections[uri].tests.append(data)
         for credit in data['credits']:
           self.contributors[credit[0]] = credit[1]
       else:
@@ -183,7 +181,7 @@ class Indexer:
     # Report errors
     if (self.errors):
         if type(errorOut) is type(('tmpl', 'out')):
-            data['errors'] = errors
+            data['errors'] = self.errors
             self.__writeTemplate(errorOut[0], data, join(destDir, errorOut[1]))
         else:
             sys.stdout.flush()
