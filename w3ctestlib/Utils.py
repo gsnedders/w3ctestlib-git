@@ -7,7 +7,7 @@
 
 import os
 import w3ctestlib
-os.environ['XML_CATALOG_FILES'] = os.path.join(w3ctestlib.__path__[0], 'catalog/catalog.xml')
+os.environ['XML_CATALOG_FILES'] = os.path.join(os.path.dirname(__file__), 'catalog/catalog.xml')
 
 ###### File path manipulation ######
 

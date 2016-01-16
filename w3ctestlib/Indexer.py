@@ -13,7 +13,7 @@ def list_contains(l, x):
 
 import sys
 import re
-from os.path import join, abspath
+from os.path import join, abspath, dirname
 from template import Template
 import w3ctestlib
 from Utils import listfiles, escapeToNamedASCII
@@ -77,7 +77,7 @@ class Indexer:
                                 'implementation-report-TEMPLATE.data.tmpl']
 
     # Initialize template engine
-    self.templatePath = [join(w3ctestlib.__path__[0], 'templates')]
+    self.templatePath = [join(dirname(__file__), 'templates')]
     if templatePathList:
       self.templatePath.extend(templatePathList)
     self.templatePath = [abspath(path) for path in self.templatePath]
