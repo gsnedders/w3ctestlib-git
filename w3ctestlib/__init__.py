@@ -1,3 +1,2 @@
-
-
-__all__ = ['Sources', 'Groups', 'Indexer', 'Suite', 'OutputFormats', 'HTMLSerializer']
+__all__ = ['Sources', 'Groups', 'Indexer', 'Suite', 'OutputFormats',
+           'HTMLSerializer', 'Utils']
