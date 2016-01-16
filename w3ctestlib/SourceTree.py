@@ -8,136 +8,143 @@ import re
 from Utils import assetName
 
 
+_ignored_paths = {".hg", ".git", ".svn", "cvs", "incoming", "work-in-progress",
+                  "data", "archive", "reports", "test-plan", "test-plans"}
+
+_ignored_files = {"lock", "LOCK", ".DS_Store", "sections.dat", "get-spec-sections.pl"}
+
+_ignored_files_startswith = {".directory", ".hg", ".git"}
+
+_test_extensions = {'.xht', '.html', '.xhtml', '.htm', '.xml', '.svg'}
+
+_reference_extensions = _test_extensions | {'.png'}
+
+_reference_paths = {'reftest', 'reference'}
+
+_reference_file_re = re.compile(r'(^|-)(not)?ref[0-9]*(-|\.[^.]+$)')
+
+
+class FileInfo(object):
+  def __init__(self, ignored, approved, category):
+    if ignored and approved:
+      raise ValueError("test cannot be ignored and approved")
+    self.ignored = ignored
+    self.approved = approved
+    self.category = category
+
+
+class FileCategory(object):  # should probably be enum from enum34
+  tool = 1
+  reference = 2
+  support = 3
+  testcase = 4
+
+
+def split_path(path):
+  if '/' in path:
+    segments = path.split("/")
+  else:
+    segments = path.split(os.path.sep)
+  pathList = segments[:-1]
+  fileName = segments[-1]
+  return (pathList, fileName)
+
+
+def categorize_file(path):
+  pathList, fileName = split_path(path)
+  baseName, fileExt = os.path.splitext(fileName)
+
+  # Check if ignored
+  ignored = (not pathList or
+             pathList[0] == "tools" or
+             _ignored_paths & set(pathList) or
+             fileName in _ignored_files or
+             any(fileName.startswith(x) for x in _ignored_files_startswith))
+
+  # Check if approved
+  approved = (not ignored and len(pathList) > 1 and pathList[0] == "approved" and
+              (pathList[1] == "support" or "src" in pathList))
+
+  # Determine category
+  if "tools" in pathList:
+    cat = FileCategory.tool
+  elif "support" in pathList:
+    cat = FileCategory.support
+  elif (fileExt in _reference_extensions and
+        (_reference_paths & set(pathList) or
+         _reference_file_re.search(fileName))):
+    cat = FileCategory.reference
+  elif fileExt in _test_extensions:
+    cat = FileCategory.testcase
+  else:
+    cat = FileCategory.support
+
+  return FileInfo(bool(ignored), bool(approved), cat)
+
+
 class SourceTree(object):
   """Class that manages structure of test repository source.
-     Temporarily hard-coded path and filename rules, this should be configurable.
   """
 
   def __init__(self, repository=None):
-    self.mTestExtensions = ['.xht', '.html', '.xhtml', '.htm', '.xml', '.svg']
-    self.mReferenceExtensions = ['.xht', '.html', '.xhtml', '.htm', '.xml', '.png', '.svg']
-    self.mRepository = repository
-
-  def _splitDirs(self, dir):
-    if ('' == dir):
-      pathList = []
-    elif ('/' in dir):
-      pathList = dir.split('/')
-    else:
-      pathList = dir.split(os.path.sep)
-    return pathList
-
-  def _splitPath(self, filePath):
-    """split a path into a list of directory names and the file name
-       paths may come form the os or mercurial, which always uses '/' as the
-       directory separator
-    """
-    dir, fileName = os.path.split(filePath.lower())
-    return (self._splitDirs(dir), fileName)
+    pass
 
   def isTracked(self, filePath):
-    pathList, fileName = self._splitPath(filePath)
-    return (not self._isIgnored(pathList, fileName))
-
-  def _isApprovedPath(self, pathList):
-    return ((1 < len(pathList)) and ('approved' == pathList[0]) and (('support' == pathList[1]) or ('src' in pathList)))
+    info = categorize_file(filePath)
+    return not info.ignored
 
   def isApprovedPath(self, filePath):
-    pathList, fileName = self._splitPath(filePath)
-    return (not self._isIgnored(pathList, fileName)) and self._isApprovedPath(pathList)
-
-  def _isIgnoredPath(self, pathList):
-      return (('.hg' in pathList) or ('.git' in pathList) or
-              ('.svn' in pathList) or ('cvs' in pathList) or
-              ('incoming' in pathList) or ('work-in-progress' in pathList) or
-              ('data' in pathList) or ('archive' in pathList) or
-              ('reports' in pathList) or ('tools' == pathList[0]) or
-              ('test-plan' in pathList) or ('test-plans' in pathList))
-
-  def _isIgnored(self, pathList, fileName):
-    if (pathList):  # ignore files in root
-      return (self._isIgnoredPath(pathList) or
-              fileName.startswith('.directory') or ('lock' == fileName) or
-              ('.ds_store' == fileName) or
-              fileName.startswith('.hg') or fileName.startswith('.git') or
-              ('sections.dat' == fileName) or ('get-spec-sections.pl' == fileName))
-    return True
+    info = categorize_file(filePath)
+    return not info.ignored and info.approved
 
   def isIgnored(self, filePath):
-    pathList, fileName = self._splitPath(filePath)
-    return self._isIgnored(pathList, fileName)
+    info = categorize_file(filePath)
+    return info.ignored
 
   def isIgnoredDir(self, dir):
-    pathList = self._splitDirs(dir)
-    return self._isIgnoredPath(pathList)
-
-  def _isToolPath(self, pathList):
-    return ('tools' in pathList)
-
-  def _isTool(self, pathList, fileName):
-    return self._isToolPath(pathList)
+    if "/" in dir:
+      path = dir + "/foo"
+    else:
+      path = os.path.join(dir, "foo")
+    info = categorize_file(path)
+    return info.ignored
 
   def isTool(self, filePath):
-    pathList, fileName = self._splitPath(filePath)
-    return (not self._isIgnored(pathList, fileName)) and self._isTool(pathList, fileName)
-
-  def _isSupportPath(self, pathList):
-    return ('support' in pathList)
-
-  def _isSupport(self, pathList, fileName):
-    return (self._isSupportPath(pathList) or
-            ((not self._isTool(pathList, fileName)) and
-             (not self._isReference(pathList, fileName)) and
-             (not self._isTestCase(pathList, fileName))))
+    info = categorize_file(filePath)
+    return not info.ignored and info.category == FileCategory.tool
 
   def isSupport(self, filePath):
-    pathList, fileName = self._splitPath(filePath)
-    return (not self._isIgnored(pathList, fileName)) and self._isSupport(pathList, fileName)
-
-  def _isReferencePath(self, pathList):
-    return (('reftest' in pathList) or ('reference' in pathList))
-
-  def _isReference(self, pathList, fileName):
-    if ((not self._isSupportPath(pathList)) and (not self._isToolPath(pathList))):
-      baseName, fileExt = os.path.splitext(fileName)[:2]
-      if (bool(re.search('(^ref-|^notref-).+', baseName)) or
-          bool(re.search('.+(-ref[0-9]*$|-notref[0-9]*$)', baseName)) or
-          ('-ref-' in baseName) or ('-notref-' in baseName)):
-        return (fileExt in self.mReferenceExtensions)
-      if (self._isReferencePath(pathList)):
-        return (fileExt in self.mReferenceExtensions)
-    return False
+    info = categorize_file(filePath)
+    return not info.ignored and info.category == FileCategory.support
 
   def isReference(self, filePath):
-    pathList, fileName = self._splitPath(filePath)
-    return (not self._isIgnored(pathList, fileName)) and self._isReference(pathList, fileName)
+    info = categorize_file(filePath)
+    return not info.ignored and info.category == FileCategory.reference
 
   def isReferenceAnywhere(self, filePath):
-    pathList, fileName = self._splitPath(filePath)
-    return self._isReference(pathList, fileName)
-
-  def _isTestCase(self, pathList, fileName):
-    if ((not self._isToolPath(pathList)) and (not self._isSupportPath(pathList)) and (not self._isReference(pathList, fileName))):
-      fileExt = os.path.splitext(fileName)[1]
-      return (fileExt in self.mTestExtensions)
-    return False
+    info = categorize_file(filePath)
+    return info.category == FileCategory.reference
 
   def isTestCase(self, filePath):
-    pathList, fileName = self._splitPath(filePath)
-    return (not self._isIgnored(pathList, fileName)) and self._isTestCase(pathList, fileName)
+    info = categorize_file(filePath)
+    return not info.ignored and info.category == FileCategory.testcase
 
   def getAssetName(self, filePath):
-    pathList, fileName = self._splitPath(filePath)
-    if (self._isReference(pathList, fileName) or self._isTestCase(pathList, fileName)):
+    info = categorize_file(filePath)
+    pathList, fileName = split_path(filePath)
+    if (info.category == FileCategory.testcase or info.category == FileCategory.reference):
       return assetName(fileName)
     return fileName.lower() # support files keep full name
 
   def getAssetType(self, filePath):
-    pathList, fileName = self._splitPath(filePath)
-    if (self._isReference(pathList, fileName)):
-      return 'reference'
-    if (self._isTestCase(pathList, fileName)):
-      return 'testcase'
-    if (self._isTool(pathList, fileName)):
+    info = categorize_file(filePath)
+    if info.category == FileCategory.tool:
       return 'tool'
-    return 'support'
+    elif info.category == FileCategory.reference:
+      return 'reference'
+    elif info.category == FileCategory.support:
+      return 'support'
+    elif info.category == FileCategory.testcase:
+      return 'testcase'
+    else:
+      assert False, "unreachable"
