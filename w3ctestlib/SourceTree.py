@@ -6,6 +6,9 @@
 
 import os
 import re
+
+import enum
+
 from Utils import assetName
 
 
@@ -36,7 +39,7 @@ class FileInfo(object):
         self.category = category
 
 
-class FileCategory(object):  # should probably be enum from enum34
+class FileCategory(enum.Enum):
     tool = 1
     reference = 2
     support = 3
