@@ -21,9 +21,6 @@ xlinkns = '{http://www.w3.org/1999/xlink}'
 class HTMLSource(XMLSource):
   """FileSource object with support for HTML metadata and HTML->XHTML conversions (untested)."""
 
-  # Private Data and Methods
-  __parser = html5lib.HTMLParser(tree=treebuilders.getTreeBuilder('lxml'))
-
   # Public Methods
 
   def __init__(self, sourceTree, sourcepath, relpath, data=None):
@@ -39,10 +36,9 @@ class HTMLSource(XMLSource):
       if data:
         with warnings.catch_warnings():
           warnings.simplefilter("ignore")
-          htmlStream = html5lib.inputstream.HTMLInputStream(data)
-          if ('utf-8-sig' != self.encoding):  # if we found a BOM, respect it
-            self.encoding = htmlStream.detectEncoding()[0]
-          self.tree = self.__parser.parse(data, encoding=self.encoding)
+          parser = html5lib.HTMLParser(tree=treebuilders.getTreeBuilder('lxml'))
+          self.tree = parser.parse(data)
+          self.encoding = parser.documentEncoding
           self.injectedTags = {}
       else:
         self.tree = None
