@@ -29,13 +29,6 @@ class TestSuite:
     self.formats = ('html4', 'xhtml1', 'xhtml1print') # XXX FIXME, hardcoded list is lame
     self.rawgroups = {}
 
-  def addTestsByExt(self, dir, ext, groupName='', groupTitle=''):
-    """Add tests from directory `dir` by file extension (via `ext`, e.g. ext='.xht').
-    """
-    group = TestGroup(self.sourcecache, dir, selfTestExt=ext,
-                      name=groupName, title=groupTitle, ui=self.ui)
-    self.addGroup(group)
-
   def addTestsByList(self, dir, filenames, groupName='', groupTitle=''):
     """Add tests from directory `dir`, via file name list `filenames`.
     """

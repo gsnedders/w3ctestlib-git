@@ -93,8 +93,6 @@ class TestGroup:
       self.manifest = None
       # Import tests
       fileNameList = []
-      if kwargs.get('selfTestExt'):
-        fileNameList += listfiles(importDir, kwargs['selfTestExt'])
       if kwargs.get('selfTestList'):
         fileNameList += kwargs['selfTestList']
       for fileName in fileNameList:
