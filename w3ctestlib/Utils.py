@@ -46,36 +46,7 @@ def isPathInsideBase(path, base=''):
 def relpath(path, start):
   """Return relative path from start to end. WARNING: this is not the
      same as a relative URL; see relativeURL()."""
-  try:
-    return os.path.relpath(path, start)
-  except AttributeError:
-    # This function is copied directly from the Python 2.6 source
-    # code, and is therefore under a different license.
-
-    if not path:
-        raise ValueError("no path specified")
-    start_list = os.path.abspath(start).split(sep)
-    path_list = os.path.abspath(path).split(sep)
-    if start_list[0].lower() != path_list[0].lower():
-        unc_path, rest = os.path.splitunc(path)
-        unc_start, rest = os.path.splitunc(start)
-        if bool(unc_path) ^ bool(unc_start):
-            raise ValueError("Cannot mix UNC and non-UNC paths (%s and %s)"
-                             % (path, start))
-        else:
-            raise ValueError("path is on drive %s, start on drive %s"
-                             % (path_list[0], start_list[0]))
-    # Work out how much of the filepath is shared by start and path.
-    for i in range(min(len(start_list), len(path_list))):
-        if start_list[i].lower() != path_list[i].lower():
-            break
-    else:
-        i += 1
-
-    rel_list = [pardir] * (len(start_list) - i) + path_list[i:]
-    if not rel_list:
-        return os.path.curdir
-    return os.path.join(*rel_list)
+  return os.path.relpath(path, start)
 
 
 def relativeURL(start, end):
