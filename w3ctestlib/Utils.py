@@ -14,6 +14,9 @@ os.environ['XML_CATALOG_FILES'] = os.path.join(os.path.dirname(__file__), 'catal
 import os.path
 from os.path import sep, pardir
 
+here = os.path.abspath(os.path.split(__file__)[0])
+repo_root = os.path.abspath(os.path.join(here, pardir, pardir, pardir))
+
 
 def assetName(path):
   return os.path.splitext(os.path.basename(path))[0].lower().encode('ascii')

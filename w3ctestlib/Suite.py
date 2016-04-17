@@ -25,7 +25,7 @@ class TestSuite:
     self.ui = ui if ui else UserInterface.ui()
     self.defaultReftestRelpath = 'reftest.list'
     self.group = None
-    self.sourcecache = sourceCache if sourceCache else SourceCache(SourceTree(hg.repository(self.ui, '.')))
+    self.sourcecache = sourceCache if sourceCache else SourceCache(SourceTree(hg.repository(self.ui, Utils.repo_root)))
     self.formats = ('html4', 'xhtml1', 'xhtml1print') # XXX FIXME, hardcoded list is lame
     self.rawgroups = {}
 
