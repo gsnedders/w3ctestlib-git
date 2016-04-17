@@ -3,7 +3,7 @@
 # Initial code by fantasai, joint copyright 2010 W3C and Microsoft
 # Licensed under BSD 3-Clause: <http://www.w3.org/Consortium/Legal/2008/03-bsd-license>
 
-from os.path import basename
+from os.path import abspath, basename, realpath
 from Utils import getMimeFromExt
 
 from XHTMLSource import XHTMLSource
@@ -32,10 +32,10 @@ class SourceCache:
 
        Cache is bypassed if loading form a change context
     """
-    if data is None and sourcepath in self.__cache:
-      source = self.__cache[sourcepath]
-      assert relpath == source.relpath
-      return source
+    abssourcepath = abspath(realpath(sourcepath))
+    key = (abssourcepath, relpath)
+    if data is None and key in self.__cache:
+      return self.__cache[key]
 
     if basename(sourcepath) == '.htaccess':
       return ConfigSource(self.sourceTree, sourcepath, relpath, data)
@@ -51,5 +51,5 @@ class SourceCache:
     else:
       source = FileSource(self.sourceTree, sourcepath, relpath, mime, data)
     if data is None:
-      self.__cache[sourcepath] = source
+      self.__cache[key] = source
     return source
