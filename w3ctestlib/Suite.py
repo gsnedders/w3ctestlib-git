@@ -24,7 +24,7 @@ class TestSuite:
 
     self.ui = ui if ui else UserInterface.ui()
     self.defaultReftestRelpath = 'reftest.list'
-    self.groups = {}
+    self.group = None
     self.sourcecache = sourceCache if sourceCache else SourceCache(SourceTree(hg.repository(self.ui, '.')))
     self.formats = ('html4', 'xhtml1', 'xhtml1print') # XXX FIXME, hardcoded list is lame
     self.rawgroups = {}
@@ -48,11 +48,12 @@ class TestSuite:
 
   def addGroup(self, group):
     """ Add CSSTestGroup `group` to store. """
-    master = self.groups.get(group.name)
-    if master:
-      master.merge(group)
+    if group.name != "":
+      raise ValueError("Group name must be empty string")
+    if self.group is None:
+      self.group = group
     else:
-      self.groups[group.name] = group
+      self.group.merge(group)
 
   def addRaw(self, dir, relpath):
     """Add the contents of directory `dir` to the test suite by copying
@@ -85,12 +86,11 @@ class TestSuite:
         elif (format == 'svg'):
           formats.append(OutputFormats.SVGFormat(dest, self.sourcecache.sourceTree))
 
-    for format in formats:
-      for group in self.groups.itervalues():
-        group.build(format)
+    if self.group is not None:
+      for format in formats:
+        self.group.build(format)
 
-    for group in self.groups.itervalues():
-      indexer.indexGroup(group)
+      indexer.indexGroup(self.group)
 
     for format in formats:
       indexer.writeIndex(format)
