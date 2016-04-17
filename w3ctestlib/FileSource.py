@@ -36,9 +36,9 @@ class FileSource:
     self.sourceTree = sourceTree
     self.sourcepath = sourcepath
     self.relpath = relpath
-    self.mimetype = mimetype or getMimeFromExt(sourcepath)
+    self.mimetype = mimetype or getMimeFromExt(sourcepath)  # Used by build.py
     self._data = data
-    self.errors = None
+    self.errors = None  # Used by build.py & Shepherd
     self.encoding = 'utf-8'
     self.refs = {}
     self.scripts = {}
@@ -180,6 +180,8 @@ class FileSource:
          - scripttest [bool]
        Strings are given in ascii unless asUnicode==True.
     """
+    # Used by build.py
+    # Used by Shepherd
 
     self.validate()
 
@@ -304,6 +306,7 @@ class FileSource:
             for ref in self.refs.values()]
 
   def isTest(self):
+    # Used by build.py
     self.validate()
     return bool(self.metadata) and bool(self.metadata.get('links'))
 

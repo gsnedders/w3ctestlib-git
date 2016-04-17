@@ -17,6 +17,7 @@ class TestSuite:
   """Representation of a standard CSS test suite."""
 
   def __init__(self, name, title, specUri, draftUri, sourceCache=None, ui=None):
+    # Used by build.py with 6 args
     self.name = name
     self.title = title
     self.specroot = specUri
@@ -32,6 +33,7 @@ class TestSuite:
   def addTestsByList(self, dir, filenames, groupName='', groupTitle=''):
     """Add tests from directory `dir`, via file name list `filenames`.
     """
+    # Used by build.py
     group = TestGroup(self.sourcecache, dir, selfTestList=filenames,
                       name=groupName, title=groupTitle, ui=self.ui)
     self.addGroup(group)
@@ -60,15 +62,18 @@ class TestSuite:
        (not processing). Note this means such tests will not be indexed.
        `relpath` gives the directory's path within the build destination.
     """
+    # Used by build.py
     self.rawgroups[dir] = relpath
 
   def setFormats(self, formats):
+    # Used by build.py
     self.formats = formats
 
   def buildInto(self, dest, indexer):
     """Builds test suite through all OutputFormats into directory at path `dest`
        or through OutputFormat destination `dest`, using Indexer `indexer`.
     """
+    # Used by build.py
     if isinstance(dest, OutputFormats.BasicFormat):
       formats = (dest,)
       dest = dest.root

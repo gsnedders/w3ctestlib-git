@@ -65,6 +65,7 @@ class Indexer:
        The '.tmpl' extension, if any, is stripped from the output filename.
        The default value is ['index.htm.tmpl', 'index.xht.tmpl', 'testinfo.data.tmpl']
     """
+    # Used by build.py with templatePathList and extraData
     self.suite = suite
     self.splitChapter = splitChapter
     self.extraData = extraData

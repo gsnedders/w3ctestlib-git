@@ -20,6 +20,8 @@ class SourceCache:
   """
 
   def __init__(self, sourceTree):
+    # Used by build.py
+    # Used by Shepherd
     self.__cache = {}
     self.sourceTree = sourceTree
 
@@ -32,6 +34,8 @@ class SourceCache:
 
        Cache is bypassed if loading form a change context
     """
+    # Used by build.py with 2 args
+    # Used by Shepherd with 3 args
     abssourcepath = abspath(realpath(sourcepath))
     key = (abssourcepath, relpath)
     if data is None and key in self.__cache:

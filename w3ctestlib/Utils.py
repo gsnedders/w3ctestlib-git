@@ -62,6 +62,7 @@ def listfiles(path, ext=None):
   """ Returns a list of all files in a directory.
       Optionally lists only files with a given extension.
   """
+  # Used by build.py
   try:
     _, _, files = os.walk(path).next()
     if (ext):
@@ -74,6 +75,7 @@ def listfiles(path, ext=None):
 def listdirs(path):
   """ Returns a list of all subdirectories in a directory.
   """
+  # Used by build.py
   try:
     _, dirs, _ = os.walk(path).next()
   except StopIteration:
@@ -98,6 +100,7 @@ extensionMap = {None: 'application/octet-stream', # default
 def getMimeFromExt(filepath):
   """Convenience function: equal to extenionMap.get(ext, extensionMap[None]).
   """
+  # Used by Shepherd
   if filepath.endswith('.htaccess'):
     return 'config/htaccess'
   ext = os.path.splitext(filepath)[1]

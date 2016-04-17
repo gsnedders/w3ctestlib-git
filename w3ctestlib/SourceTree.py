@@ -93,13 +93,17 @@ class SourceTree(object):
     """
 
     def __init__(self, repository=None):
+        # Used by build.py with 0 args
+        # Used by Shepherd with 1 arg
         pass
 
     def isTracked(self, filePath):
+        # Used by Shepherd
         info = categorize_file(filePath)
         return not info.ignored
 
     def isApprovedPath(self, filePath):
+        # Used by Shepherd
         info = categorize_file(filePath)
         return not info.ignored and info.approved
 
@@ -108,6 +112,7 @@ class SourceTree(object):
         return info.ignored
 
     def isIgnoredDir(self, dir):
+        # Used by build.py
         if "/" in dir:
             path = dir + "/foo"
         else:
@@ -132,10 +137,12 @@ class SourceTree(object):
         return info.category == FileCategory.reference
 
     def isTestCase(self, filePath):
+        # Used by build.py
         info = categorize_file(filePath)
         return not info.ignored and info.category == FileCategory.testcase
 
     def getAssetName(self, filePath):
+        # Used by Shepherd
         info = categorize_file(filePath)
         pathList, fileName = split_path(filePath)
         if (info.category == FileCategory.testcase or info.category == FileCategory.reference):
@@ -143,6 +150,7 @@ class SourceTree(object):
         return fileName.lower()  # support files keep full name
 
     def getAssetType(self, filePath):
+        # Used by Shepherd
         info = categorize_file(filePath)
         if info.category == FileCategory.tool:
             return 'tool'
