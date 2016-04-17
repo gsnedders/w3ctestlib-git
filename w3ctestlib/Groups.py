@@ -7,8 +7,7 @@ import shutil
 import os.path
 import Utils
 from os.path import exists, join
-from Sources import SourceSet, ConfigSource, ReftestManifest
-from Utils import listfiles
+from Sources import SourceSet, ConfigSource
 
 excludeDirs = ['CVS', '.svn', '.hg']
 
@@ -33,13 +32,6 @@ class TestGroup:
          Directory path `importDir`, whose context is imported into the group
          Option: Tuple of support directory names `supportDirNames` defaults
                  to ('support',).
-         Kwarg: File path manifestPath relative to `importDir` that
-           identifies the reftest manifest file (usually called 'reftest.list').
-         Kwarg: File path manifestDest as destination (relative) path for
-                the reftest manifest file. Defaults to value of manifestPath.
-         If manifest provided, assumes that only the files listed in the manifest,
-         the .htaccess files in its parent directory, and the `importDir`'s
-         .htaccess file and support directory are relevant to the test suite.
     """
     assert exists(importDir), "Directory to import %s does not exist" % importDir
 
@@ -77,30 +69,16 @@ class TestGroup:
     self.tests = SourceSet(sourceCache)
     self.refs = SourceSet(sourceCache)
 
-    # Read manifest
-    manifestPath = kwargs.get('manifestPath', None)
-    manifestDest = kwargs.get('manifestDest', manifestPath)
-    if (manifestPath):
-      self.manifest = ReftestManifest(join(importDir, manifestPath), manifestDest)
-
-      # Import tests
-      for (testSrc, refSrc), (testRel, refRel), refType in self.manifest:
-        test = sourceCache.generateSource(testSrc, testRel)
-        ref = sourceCache.generateSource(refSrc, refRel)
-        test.addReference(ref, refType)
-        self.tests.addSource(test, self.ui)
-    else:
-      self.manifest = None
-      # Import tests
-      fileNameList = []
-      if kwargs.get('selfTestList'):
-        fileNameList += kwargs['selfTestList']
-      for fileName in fileNameList:
-        filePath = join(importDir, fileName)
-        if sourceTree.isTestCase(filePath):
-          test = sourceCache.generateSource(filePath, fileName)
-          if (test.isTest()):
-            self.tests.addSource(test, self.ui)
+    # Import tests
+    fileNameList = []
+    if kwargs.get('selfTestList'):
+      fileNameList += kwargs['selfTestList']
+    for fileName in fileNameList:
+      filePath = join(importDir, fileName)
+      if sourceTree.isTestCase(filePath):
+        test = sourceCache.generateSource(filePath, fileName)
+        if (test.isTest()):
+          self.tests.addSource(test, self.ui)
 
     for test in self.tests.iter():
       if (test.isReftest()):
@@ -160,11 +138,6 @@ class TestGroup:
 
     self.refs = SourceSet.combine(self.refs, other.refs, self.ui)
     other.refs = None
-    if self.manifest and other.manifest:
-      self.manifest.append(other.manifest)
-    else:
-      self.manifest = self.manifest or other.manifest
-    other.manifest = None
 
   def build(self, format):
     """Build Group's contents through OutputFormat `format`.
@@ -186,8 +159,6 @@ class TestGroup:
 
     # Write refs
     self.refs.write(format)
-    if self.manifest:
-      format.write(self.manifest)
 
     # copy support files to reference directory (XXX temp until proper support path fixup)
     formatDir = format.destDir()

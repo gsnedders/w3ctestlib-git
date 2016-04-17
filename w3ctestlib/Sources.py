@@ -10,7 +10,6 @@ from LineString import LineString
 from Metadata import Metadata
 from NamedDict import NamedDict
 from ReferenceData import ReferenceData
-from ReftestManifest import ReftestManifest
 from SVGSource import SVGSource
 from SourceCache import SourceCache
 from SourceSet import SourceSet
@@ -19,4 +18,4 @@ from StringReader import StringReader
 from XHTMLSource import XHTMLSource
 from XMLSource import XMLSource
 
-__all__ = ['ConfigSource', 'FileSource', 'HTMLSource', 'LineString', 'Metadata', 'NamedDict', 'ReferenceData', 'ReftestManifest', 'SVGSource', 'SourceCache', 'SourceSet', 'SourceTree', 'StringReader', 'XHTMLSource', 'XMLSource']
+__all__ = ['ConfigSource', 'FileSource', 'HTMLSource', 'LineString', 'Metadata', 'NamedDict', 'ReferenceData', 'SVGSource', 'SourceCache', 'SourceSet', 'SourceTree', 'StringReader', 'XHTMLSource', 'XMLSource']

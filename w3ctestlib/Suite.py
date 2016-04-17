@@ -38,16 +38,6 @@ class TestSuite:
                       name=groupName, title=groupTitle, ui=self.ui)
     self.addGroup(group)
 
-  def addReftests(self, dir, manifestPath, groupName='', groupTitle=''):
-    """Add tests by importing context of directory `dir` and importing all
-       tests listed in the `reftestManifestName` manifest inside `dir`.
-    """
-    group = TestGroup(self.sourcecache,
-                      dir, manifestPath=manifestPath,
-                      manifestDest=self.defaultReftestRelpath,
-                      name=groupName, title=groupTitle, ui=self.ui)
-    self.addGroup(group)
-
   def addGroup(self, group):
     """ Add CSSTestGroup `group` to store. """
     if group.name != "":
