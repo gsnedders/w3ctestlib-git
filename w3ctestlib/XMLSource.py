@@ -25,8 +25,7 @@ class XMLSource(FileSource):
   NodeTuple = collections.namedtuple('NodeTuple', ['next', 'prev', 'reference', 'notReference'])
 
   # Public Data
-  syntaxErrorDoc = \
-  u"""
+  syntaxErrorDoc = u"""
   <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
   <html xmlns="http://www.w3.org/1999/xhtml">
     <head><title>Syntax Error</title></head>
@@ -41,7 +40,7 @@ class XMLSource(FileSource):
 
   # Private Data and Methods
   __parser = etree.XMLParser(no_network=True,
-  # perf nightmare           dtd_validation=True,
+                             # dtd_validation=True,  # perf nightmare
                              remove_comments=False,
                              strip_cdata=False,
                              resolve_entities=False)

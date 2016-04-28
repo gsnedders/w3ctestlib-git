@@ -3,16 +3,17 @@
 # Initial code by fantasai, joint copyright 2010 W3C and Microsoft
 # Licensed under BSD 3-Clause: <http://www.w3.org/Consortium/Legal/2008/03-bsd-license>
 
+from htmlentitydefs import entitydefs
+import os
+from os.path import sep, pardir
+
+import w3ctestlib
+
 ###### XML Parsing ######
 
-import os
-import w3ctestlib
 os.environ['XML_CATALOG_FILES'] = os.path.join(os.path.dirname(__file__), 'catalog/catalog.xml')
 
 ###### File path manipulation ######
-
-import os.path
-from os.path import sep, pardir
 
 here = os.path.abspath(os.path.split(__file__)[0])
 repo_root = os.path.abspath(os.path.join(here, pardir, pardir, pardir))
@@ -107,8 +108,6 @@ def getMimeFromExt(filepath):
   return extensionMap.get(ext, extensionMap[None])
 
 ###### Escaping ######
-
-from htmlentitydefs import entitydefs
 
 entityify = dict([c, e] for e, c in entitydefs.iteritems())
 

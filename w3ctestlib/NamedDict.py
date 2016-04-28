@@ -11,16 +11,16 @@ class NamedDict(MutableMapping):
         if key in self:
             return getattr(self, key)
         else:
-            raise KeyError, key
+            raise KeyError(key)
 
     def __setitem__(self, key, value):
         if key in self:
             setattr(self, key, value)
         else:
-            raise KeyError, key
+            raise KeyError(key)
 
     def __delitem__(self, key):
-        raise TypeError, "cannot remove from a NamedDict"
+        raise TypeError("cannot remove from a NamedDict")
 
     def __len__(self):
         return len(self.__slots__)

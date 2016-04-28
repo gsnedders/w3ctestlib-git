@@ -48,8 +48,8 @@ class FileSource:
   def __eq__(self, other):
     if not isinstance(other, FileSource):
       return False
-    return self.sourcepath == other.sourcepath or \
-      filecmp.cmp(self.sourcepath, other.sourcepath)
+    return (self.sourcepath == other.sourcepath or
+            filecmp.cmp(self.sourcepath, other.sourcepath))
 
   def __ne__(self, other):
     return not self == other
@@ -260,19 +260,17 @@ class FileSource:
     references = listReferences(self, set([self.sourcepath])) if (self.refs) else None
 
     if (self.metadata):
-      data = Metadata(
-        name=encode(self.name()),
-        title=escape(self.metadata['title']),
-        asserts=[escape(assertion) for assertion in self.metadata['asserts']],
-        credits=[UserData(escape(name), encode(link)) for name, link in self.metadata['credits']],
-        reviewers=[UserData(escape(name), encode(link)) for name, link in self.metadata['reviewers']],
-        flags=[encode(flag) for flag in self.metadata['flags']],
-        links=[encode(link) for link in self.metadata['links']],
-        references=references,
-        revision=self.revision(),
-        selftest=self.isSelftest(),
-        scripttest=self.isScripttest()
-      )
+      data = Metadata(name=encode(self.name()),
+                      title=escape(self.metadata['title']),
+                      asserts=[escape(assertion) for assertion in self.metadata['asserts']],
+                      credits=[UserData(escape(name), encode(link)) for name, link in self.metadata['credits']],
+                      reviewers=[UserData(escape(name), encode(link)) for name, link in self.metadata['reviewers']],
+                      flags=[encode(flag) for flag in self.metadata['flags']],
+                      links=[encode(link) for link in self.metadata['links']],
+                      references=references,
+                      revision=self.revision(),
+                      selftest=self.isSelftest(),
+                      scripttest=self.isScripttest())
       return data
     return None
 

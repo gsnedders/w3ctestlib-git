@@ -98,10 +98,7 @@ class TestSuite:
           if xdir in dirs:
             dirs.remove(xdir)
             rmtree(join(root, xdir))
-        rawtests.extend(
-          [join(Utils.relpath(root, dest), file)
-           for file in files]
-        )
+        rawtests.extend([join(Utils.relpath(root, dest), file) for file in files])
 
     rawtests.sort()
     indexer.writeOverview(dest, addTests=rawtests)

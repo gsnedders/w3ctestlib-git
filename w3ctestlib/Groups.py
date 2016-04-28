@@ -122,8 +122,7 @@ class TestGroup:
   def merge(self, other):
     """Merge Group `other`'s contents into this Group and clear its contents.
     """
-    assert isinstance(other, TestGroup), \
-      "Expected Group instance, got %s" % type(other)
+    assert isinstance(other, TestGroup), "Expected Group instance, got %s" % type(other)
     if self.htaccess and other.htaccess:
       self.htaccess.append(other.htaccess)
     else:

@@ -6,11 +6,6 @@
 # Define contains vmethod for Template Toolkit
 from template.stash import list_op
 
-
-@list_op("contains")
-def list_contains(l, x):
-  return x in l
-
 import sys
 import re
 from os.path import join, abspath, dirname
@@ -19,6 +14,11 @@ import w3ctestlib
 from Utils import listfiles, escapeToNamedASCII
 from OutputFormats import ExtensionMap
 import shutil
+
+
+@list_op("contains")
+def list_contains(l, x):
+  return x in l
 
 
 class Section:
@@ -82,12 +82,10 @@ class Indexer:
     if templatePathList:
       self.templatePath.extend(templatePathList)
     self.templatePath = [abspath(path) for path in self.templatePath]
-    self.tt = Template({
-      'INCLUDE_PATH': self.templatePath,
-      'ENCODING': 'utf-8',
-      'PRE_CHOMP': 1,
-      'POST_CHOMP': 0,
-    })
+    self.tt = Template({'INCLUDE_PATH': self.templatePath,
+                        'ENCODING': 'utf-8',
+                        'PRE_CHOMP': 1,
+                        'POST_CHOMP': 0})
 
     # Load toc data
     self.sections = {}
@@ -97,7 +95,7 @@ class Indexer:
       numstr = escapeToNamedASCII(numstr)
       title = escapeToNamedASCII(title) if title else None
       self.sections[uriKey] = Section(uri, title, numstr)
-    
+
     self.suites = suites
     self.flags = flags
 
@@ -189,8 +187,8 @@ class Indexer:
         else:
             sys.stdout.flush()
             for errorLocation in self.errors:
-                print >> errorOut, "Error in %s: %s" % \
-                  (errorLocation, ' '.join([str(error) for error in self.errors[errorLocation]]))
+                print >> errorOut, ("Error in %s: %s" %
+                                    (errorLocation, ' '.join([str(error) for error in self.errors[errorLocation]])))
 
   def writeIndex(self, format):
     """Write indices into test suite build output through format `format`.
