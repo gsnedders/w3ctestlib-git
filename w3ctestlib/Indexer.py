@@ -10,7 +10,6 @@ import sys
 import re
 from os.path import join, abspath, dirname
 from template import Template
-import w3ctestlib
 from Utils import listfiles, escapeToNamedASCII
 from OutputFormats import ExtensionMap
 import shutil

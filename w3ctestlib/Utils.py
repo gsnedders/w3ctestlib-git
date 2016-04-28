@@ -5,9 +5,7 @@
 
 from htmlentitydefs import entitydefs
 import os
-from os.path import sep, pardir
-
-import w3ctestlib
+from os.path import pardir
 
 ###### XML Parsing ######
 
