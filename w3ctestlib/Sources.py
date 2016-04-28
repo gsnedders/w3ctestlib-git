@@ -18,4 +18,7 @@ from StringReader import StringReader
 from XHTMLSource import XHTMLSource
 from XMLSource import XMLSource
 
-__all__ = ['ConfigSource', 'FileSource', 'HTMLSource', 'LineString', 'Metadata', 'NamedDict', 'ReferenceData', 'SVGSource', 'SourceCache', 'SourceSet', 'SourceTree', 'StringReader', 'XHTMLSource', 'XMLSource']
+__all__ = ['ConfigSource', 'FileSource', 'HTMLSource', 'LineString', 'Metadata',
+           'NamedDict', 'ReferenceData', 'SVGSource', 'SourceCache',
+           'SourceSet', 'SourceTree', 'StringReader', 'XHTMLSource',
+           'XMLSource']
