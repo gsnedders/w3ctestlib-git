@@ -10,4 +10,4 @@ setup(name='w3ctestlib',
       description='CSS WG testing tools/library',
       packages=find_packages(),
       package_data={'w3ctestlib': ['catalog/*', 'templates/*']},
-     )
+      )
