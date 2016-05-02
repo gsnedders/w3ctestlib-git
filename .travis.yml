@@ -1,0 +1,33 @@
+language: python
+python: 3.4
+
+sudo: false
+
+cache:
+  directories:
+    - $HOME/.cache/pip
+    - $HOME/.pyenv
+
+env:
+  - TOXENV=py27
+  - TOXENV=pypy PYPY_VERSION="5.1"
+
+install:
+  - | # This is a horrible hack around Travis CI having ancient versions of PyPy
+    if [[ "${TOXENV}" = pypy* ]]; then
+        export PYENV_ROOT="$HOME/.pyenv"
+        if [ -f "$PYENV_ROOT/bin/pyenv" ]; then
+          pushd "$PYENV_ROOT" && git pull && popd
+        else
+          rm -rf "$PYENV_ROOT" && git clone https://github.com/yyuu/pyenv.git "$PYENV_ROOT"
+        fi
+        export PATH="$PYENV_ROOT/bin:$PATH"
+        eval "$(pyenv init -)"
+        pyenv install --skip-existing pypy-$PYPY_VERSION
+        virtualenv -p "$PYENV_ROOT/versions/pypy-$PYPY_VERSION/bin/python" ~/.venv
+        source ~/.venv/bin/activate
+    fi
+  - pip install -U tox
+
+script:
+  - tox
