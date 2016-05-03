@@ -49,3 +49,17 @@ class TestHTMLSource(unittest.TestCase):
                                   u"<meta charset=utf8><p>C\u00c9fe".encode("utf-8"))
         f.validate()
         self.assertEquals("utf-8", f.encoding)
+
+    def test_distant_meta(self):
+        html = u"<title>C\u00c9fe</title><!--a--><meta charset='utf-8'>".encode('utf-8')
+        pad = 1024 - len(html) + 1
+        html = html.replace(b"-a-", b"-" + (b"a" * pad) + b"-")
+        assert len(html) == 1024  # Sanity
+        tree = SourceTree.SourceTree()
+        f = HTMLSource.HTMLSource(tree,
+                                  "a.html",
+                                  "a.html",
+                                  html)
+        f.validate()
+        meta = f.getMetadata(asUnicode=True)
+        self.assertEquals(u"C\u00c9fe".encode('utf-8'), meta["title"])
