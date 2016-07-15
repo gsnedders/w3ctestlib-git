@@ -5,20 +5,20 @@
 
 # Define contains vmethod for Template Toolkit
 from template.stash import list_op
+
+import sys
+import re
+from os.path import join, abspath, dirname
+from template import Template
+from Utils import listfiles, escapeToNamedASCII
+from OutputFormats import ExtensionMap
+import shutil
+
+
 @list_op("contains")
 def list_contains(l, x):
   return x in l
 
-import sys
-import re
-import os
-import codecs
-from os.path import join, exists, abspath
-from template import Template
-import w3ctestlib
-from Utils import listfiles, escapeToNamedASCII
-from OutputFormats import ExtensionMap
-import shutil
 
 class Section:
   def __init__(self, uri, title, numstr):
@@ -26,10 +26,13 @@ class Section:
     self.title = title
     self.numstr = numstr
     self.tests = []
+
   def __cmp__(self, other):
     return cmp(self.natsortkey(), other.natsortkey())
+
   def chapterNum(self):
     return self.numstr.partition('.')[0]
+
   def natsortkey(self):
     chunks = self.numstr.partition('.#')[0].split('.')
     for index in range(len(chunks)):
@@ -40,6 +43,7 @@ class Section:
         chunks[index] = (1, chunks[index])
     return (chunks, self.numstr)
 
+
 class Indexer:
 
   def __init__(self, suite, sections, suites, flags, splitChapter=False, templatePathList=None,
@@ -49,7 +53,7 @@ class Indexer:
 
        The toc data file should be list of tab-separated records, one
        per line, of each spec section's uri, number/letter, and title.
-       `splitChapter` selects a single page index if False, chapter 
+       `splitChapter` selects a single page index if False, chapter
        indicies if True.
        `extraData` can be a dictionary whose data gets passed to the templates.
        `overviewCopyExts` lists file extensions that should be found
@@ -60,35 +64,37 @@ class Indexer:
        The '.tmpl' extension, if any, is stripped from the output filename.
        The default value is ['index.htm.tmpl', 'index.xht.tmpl', 'testinfo.data.tmpl']
     """
-    self.suite        = suite
+    # Used by build.py with templatePathList and extraData
+    self.suite = suite
     self.splitChapter = splitChapter
-    self.extraData    = extraData
+    self.extraData = extraData
     self.overviewCopyExtPat = re.compile('.*(%s)$' % '|'.join(overviewCopyExts))
-    self.overviewTmplNames = overviewTmplNames if overviewTmplNames is not None \
-      else ['index.htm.tmpl', 'index.xht.tmpl', 'testinfo.data.tmpl',
-            'implementation-report-TEMPLATE.data.tmpl']
+    if overviewTmplNames is not None:
+      self.overviewTmplNames = overviewTmplNames
+    else:
+      self.overviewTmplNames = ['index.htm.tmpl', 'index.xht.tmpl',
+                                'testinfo.data.tmpl',
+                                'implementation-report-TEMPLATE.data.tmpl']
 
     # Initialize template engine
-    self.templatePath = [join(w3ctestlib.__path__[0], 'templates')]
+    self.templatePath = [join(dirname(__file__), 'templates')]
     if templatePathList:
       self.templatePath.extend(templatePathList)
     self.templatePath = [abspath(path) for path in self.templatePath]
-    self.tt = Template({
-       'INCLUDE_PATH': self.templatePath,
-       'ENCODING'    : 'utf-8',
-       'PRE_CHOMP'   : 1,
-       'POST_CHOMP'  : 0,
-    })
+    self.tt = Template({'INCLUDE_PATH': self.templatePath,
+                        'ENCODING': 'utf-8',
+                        'PRE_CHOMP': 1,
+                        'POST_CHOMP': 0})
 
     # Load toc data
     self.sections = {}
     for uri, numstr, title in sections:
-      uri = intern(uri.encode('ascii'))
-      uriKey = intern(self._normalizeScheme(uri))
+      uri = uri.encode('ascii')
+      uriKey = self._normalizeScheme(uri)
       numstr = escapeToNamedASCII(numstr)
       title = escapeToNamedASCII(title) if title else None
       self.sections[uriKey] = Section(uri, title, numstr)
-    
+
     self.suites = suites
     self.flags = flags
 
@@ -110,13 +116,13 @@ class Indexer:
         data['file'] = '/'.join((group.name, test.relpath)) \
                        if group.name else test.relpath
         if (data['scripttest']):
-            data['flags'].append(intern('script'))
+            data['flags'].append('script')
         self.alltests.append(data)
         for uri in data['links']:
           uri = self._normalizeScheme(uri)
           uri = uri.replace(self._normalizeScheme(self.suite.draftroot), self._normalizeScheme(self.suite.specroot))
-          if self.sections.has_key(uri):
-            testlist = self.sections[uri].tests.append(data)
+          if uri in self.sections:
+            self.sections[uri].tests.append(data)
         for credit in data['credits']:
           self.contributors[credit[0]] = credit[1]
       else:
@@ -124,9 +130,8 @@ class Indexer:
 
   def __writeTemplate(self, template, data, outfile):
     o = self.tt.process(template, data)
-    f = open(outfile, 'w')
-    f.write(o.encode('utf-8'))
-    f.close()
+    with open(outfile, 'w') as f:
+      f.write(o.encode('utf-8'))
 
   def writeOverview(self, destDir, errorOut=sys.stderr, addTests=[]):
     """Write format-agnostic pages such as test suite overview pages,
@@ -143,23 +148,23 @@ class Indexer:
 
     # Set common values
     data = self.extraData.copy()
-    data['suitetitle']   = self.suite.title
-    data['suite']        = self.suite.name
-    data['specroot']     = self.suite.specroot
-    data['draftroot']    = self.suite.draftroot
+    data['suitetitle'] = self.suite.title
+    data['suite'] = self.suite.name
+    data['specroot'] = self.suite.specroot
+    data['draftroot'] = self.suite.draftroot
     data['contributors'] = self.contributors
-    data['tests']        = self.alltests
-    data['extmap']       = ExtensionMap({'.xht':'', '.html':'', '.htm':'', '.svg':''})
-    data['formats']      = self.suite.formats
-    data['addtests']     = addTests
-    data['suites']       = self.suites
-    data['flagInfo']     = self.flags
-    data['formatInfo']   = { 'html4': { 'report': True, 'path': 'html4', 'ext': 'htm', 'filter': 'nonHTML'},
-                             'html5': { 'report': True, 'path': 'html', 'ext': 'htm', 'filter': 'nonHTML' },
-                             'xhtml1': { 'report': True, 'path': 'xhtml1', 'ext': 'xht', 'filter': 'HTMLonly' },
-                             'xhtml1print': { 'report': False, 'path': 'xhtml1print', 'ext': 'xht', 'filter': 'HTMLonly' },
-                             'svg': { 'report': True, 'path': 'svg', 'ext': 'svg', 'filter': 'HTMLonly' }
-                           }
+    data['tests'] = self.alltests
+    data['extmap'] = ExtensionMap({'.xht': '', '.html': '', '.htm': '', '.svg': ''})
+    data['formats'] = self.suite.formats
+    data['addtests'] = addTests
+    data['suites'] = self.suites
+    data['flagInfo'] = self.flags
+    data['formatInfo'] = {'html4': {'report': True, 'path': 'html4', 'ext': 'htm', 'filter': 'nonHTML'},
+                          'html5': {'report': True, 'path': 'html', 'ext': 'htm', 'filter': 'nonHTML'},
+                          'xhtml1': {'report': True, 'path': 'xhtml1', 'ext': 'xht', 'filter': 'HTMLonly'},
+                          'xhtml1print': {'report': False, 'path': 'xhtml1print', 'ext': 'xht', 'filter': 'HTMLonly'},
+                          'svg': {'report': True, 'path': 'svg', 'ext': 'svg', 'filter': 'HTMLonly'}
+                          }
 
     # Copy simple copy files
     for tmplDir in reversed(self.templatePath):
@@ -175,14 +180,14 @@ class Indexer:
 
     # Report errors
     if (self.errors):
-        if type(errorOut) is type(('tmpl','out')):
-            data['errors'] = errors
+        if errorOut is ('tmpl', 'out'):
+            data['errors'] = self.errors
             self.__writeTemplate(errorOut[0], data, join(destDir, errorOut[1]))
         else:
             sys.stdout.flush()
             for errorLocation in self.errors:
-                print >> errorOut, "Error in %s: %s" % \
-                               (errorLocation, ' '.join([str(error) for error in self.errors[errorLocation]]))
+                print >> errorOut, ("Error in %s: %s" %
+                                    (errorLocation, ' '.join([str(error) for error in self.errors[errorLocation]])))
 
   def writeIndex(self, format):
     """Write indices into test suite build output through format `format`.
@@ -191,17 +196,17 @@ class Indexer:
     # Set common values
     data = self.extraData.copy()
     data['suitetitle'] = self.suite.title
-    data['suite']      = self.suite.name
-    data['specroot']   = self.suite.specroot
-    data['draftroot']  = self.suite.draftroot
-    
-    data['indexext']   = format.indexExt
-    data['isXML']      = format.indexExt.startswith('.x')
-    data['formatdir']  = format.formatDirName
-    data['extmap']     = format.extMap
-    data['tests']      = self.alltests
-    data['suites']     = self.suites
-    data['flagInfo']   = self.flags
+    data['suite'] = self.suite.name
+    data['specroot'] = self.suite.specroot
+    data['draftroot'] = self.suite.draftroot
+
+    data['indexext'] = format.indexExt
+    data['isXML'] = format.indexExt.startswith('.x')
+    data['formatdir'] = format.formatDirName
+    data['extmap'] = format.extMap
+    data['tests'] = self.alltests
+    data['suites'] = self.suites
+    data['flagInfo'] = self.flags
 
     # Generate indices:
 
@@ -239,10 +244,10 @@ class Indexer:
       # Generate chapter tocs
       for chap in chapters:
         data['chaptertitle'] = chap.title
-        data['testcount']    = chap.testcount
-        data['sections']     = chap.sections
-        self.__writeTemplate('test-toc.tmpl', data, format.dest('chapter-%s%s' \
-                             % (chap.numstr, format.indexExt)))
+        data['testcount'] = chap.testcount
+        data['sections'] = chap.sections
+        self.__writeTemplate('test-toc.tmpl', data, format.dest('chapter-%s%s'
+                                                                % (chap.numstr, format.indexExt)))
 
     else: # not splitChapter
       data['chapters'] = sectionlist
